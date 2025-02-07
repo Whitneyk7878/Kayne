@@ -44,3 +44,4 @@ sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
 sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
 sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
 sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
+echo "DONE"
