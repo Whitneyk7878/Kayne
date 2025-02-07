@@ -35,13 +35,13 @@ echo "Creating hidden directory..."
 sudo mkdir /lib/.tarkov
 # Archive and store system files
 echo "Compressing and storing system files individually..."
-sudo tar -czf /lib/.tarkov^M/shadow_backup.tar.gz /etc/shadow
-sudo tar -czf /lib/.tarkov^M/passwd_backup.tar.gz /etc/passwd
-sudo tar -czf /lib/.tarkov^M/fail2ban_backup.tar.gz /etc/fail2ban/
-sudo tar -czf /lib/.tarkov^M/hosts_backup.tar.gz /etc/hosts
-sudo tar -czf /lib/.tarkov^M/log_backup.tar.gz /var/log
-sudo tar -czf /lib/.tarkov^M/mail_backup.tar.gz /var/mail
-sudo tar -czf /lib/.tarkov^M/postfix_spool_backup.tar.gz /var/spool/postfix/
-sudo tar -czf /lib/.tarkov^M/postfix_backup.tar.gz /etc/postfix/
-sudo tar -czf /lib/.tarkov^M/dovecot_backup.tar.gz /etc/dovecot
+sudo tar -czf /lib/.tarkov/shadow_backup.tar.gz /etc/shadow
+sudo tar -czf /lib/.tarkov/passwd_backup.tar.gz /etc/passwd
+sudo tar -czf /lib/.tarkov/fail2ban_backup.tar.gz /etc/fail2ban/
+sudo tar -czf /lib/.tarkov/hosts_backup.tar.gz /etc/hosts
+sudo tar -czf /lib/.tarkov/log_backup.tar.gz /var/log
+sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
+sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
+sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
+sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
 echo "DONE"
