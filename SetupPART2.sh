@@ -1,4 +1,27 @@
 #!/bin/bash
+# Update system
+echo "Updating and upgrading system packages..."
+yum update -y && yum upgrade -y
+# Enable and start Dovecot and Postfix
+echo "Enabling and starting Dovecot and Postfix..."
+systemctl enable dovecot
+systemctl enable postfix
+systemctl start dovecot
+systemctl start postfix
+# Install fail2ban
+echo "Installing fail2ban..."
+yum install -y fail2ban
+# Create fail2ban log file
+echo "Creating fail2ban log file..."
+touch /var/log/fail2banlog
+# Backup and configure fail2ban
+echo "Configuring fail2ban..."
+cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+# Restart fail2ban service
+echo "Restarting fail2ban service..."
+systemctl enable fail2ban
+systemctl start fail2ban
+#THIS IS THE SECOND HALF FOR MONITORING
 # Update and install necessary packages
 echo "Installing required packages..."
 sudo yum install -y aide rkhunter clamav clamd clamav-update
