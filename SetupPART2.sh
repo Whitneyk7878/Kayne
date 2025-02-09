@@ -2,9 +2,9 @@
 echo -e "starting script"
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "             General Security Measures                           "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m             General Security Measures                      \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Only allow root login from console
 echo "tty1" > /etc/securetty
@@ -14,10 +14,54 @@ echo "DONE"
 # DENY ALL TCP WRAPPERS
 echo "ALL:ALL" > /etc/hosts.deny
 
+echo "Removing all users from the wheel group except root..."
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                     Firewall                           "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+# Get a list of all users in the wheel group
+wheel_users=$(grep '^wheel:' /etc/group | cut -d: -f4 | tr ',' '\n')
+
+# Loop through each user and remove them if they are not root
+for user in $wheel_users; do
+    if [[ "$user" != "root" ]]; then
+        echo "Removing $user from wheel group..."
+        gpasswd -d "$user" wheel
+    fi
+done
+
+echo "Cleanup complete. Only root has sudo permissions now."
+
+#!/bin/bash
+
+# Ensure only root can run this script
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root."
+    exit 1
+fi
+
+######################################THIS COULD BREAK IT ALL################################################################################
+echo "Restricting permissions: Only root will have full privileges."
+
+# Loop through each user in the system (excluding root)
+for user in $(getent passwd | awk -F: '$3 >= 1000 {print $1}'); do
+    if [[ "$user" != "root" ]]; then
+        echo "Modifying permissions for user: $user"
+
+        # Set home directory permissions to read-only
+        chmod -R 755 /home/"$user"
+        
+        # Remove sudo/wheel access
+        gpasswd -d "$user" wheel 2>/dev/null
+        gpasswd -d "$user" sudo 2>/dev/null
+
+        # Set user shell to /bin/false to prevent login if needed
+        usermod -s /bin/false "$user"
+    fi
+done
+
+
+
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                     Firewall                         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sudo yum install iptables-services -y
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
@@ -74,9 +118,9 @@ iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                Goofy Stuff Removal                     "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                Stuff Removal                         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 #Remove Stuff I Dont like
 yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y
@@ -126,9 +170,9 @@ systemctl disable netfs
 systemctl disable nfs
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                Kernel Hardening                        "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m               Kernel Hardening                       \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Disable core dumps for users
 echo -e "Disabling core dumps for users"
@@ -171,9 +215,9 @@ EOF
 sudo sysctl -p
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "       Update + Upgrade Packages for Security           "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m               Update + Upgrade                       \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Update system
 echo "Updating and upgrading system packages..."
@@ -182,9 +226,9 @@ sudo yum update -y && yum upgrade -y
 
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                 Securing Dovecot                       "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                  Securing Dovecot                    \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Enable and start Dovecot and Postfix
 echo "Enabling and starting Dovecot and Postfix..."
@@ -197,9 +241,9 @@ sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging
 sudo systemctl restart dovecot
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "              Implementing Fail2Ban                     "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Install fail2ban
 echo "Installing fail2ban..."
@@ -219,9 +263,9 @@ systemctl enable fail2ban
 systemctl restart fail2ban
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "             Downloading Security Tools                 "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m              Downloading Security Tools              \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Update and install necessary packages
 echo "Installing required packages..."
@@ -233,9 +277,9 @@ echo "Insalling Lynis..."
 sudo yum install lynis -y
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "         Installing and Configuring Auditd              "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                     AuditD                         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Enable and start auditd
 echo "Configuring auditd..."
@@ -249,9 +293,9 @@ sudo mv audit.rules /etc/audit/rules.d/
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "            Antivirus Solution (ClamAV)                 "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                     CLAMAV                           \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Configure ClamAV
 echo "Configuring ClamAV..."
@@ -259,9 +303,9 @@ sudo sed -i '8s/^/#/' /etc/freshclam.conf
 sudo freshclam
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                     Backups                            "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                     Backups                         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Create hidden directory for compressed files
 echo "Creating hidden directory..."
@@ -278,17 +322,17 @@ sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
 sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
 sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "            I HATE THE ANTICHRIST (Compilers)           "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 #Remove Compilers
 sudo yum remove libgcc clang make cmake automake autoconf -y
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "        IPv6 is for Microsoft Engineers not me          "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m        IPv6 is for Microsoft Engineers not me        \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 if grep -q "udp6" /etc/netconfig
 then
@@ -300,9 +344,9 @@ else
 fi
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                 Locking Down CRON                      "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                   Cron Lockdown                      \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Secure cron
 echo "Locking down Cron"
@@ -322,17 +366,17 @@ chmod 600 /etc/crontab
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "                  ITS TIME FOR NTP                      "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m                     NTP                         \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 sudo yum install ntpdate -y
 ntpdate pool.ntp.org
 
 
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "            Diffing Stuff For Baselines                 "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m             Diffing for Baselines                    \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Create DIFFING directory
 echo "Creating DIFFING directory..."
@@ -349,5 +393,9 @@ sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
 #Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo "\e[38;5;46m            Initializing AIDE Database                \e[0m"
+echo "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sudo aide --init
+sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 echo "FINISHED MAKE SURE YOU REBOOT"
