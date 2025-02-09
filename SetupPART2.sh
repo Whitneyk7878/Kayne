@@ -14,28 +14,6 @@ echo "DONE"
 # DENY ALL TCP WRAPPERS
 echo "ALL:ALL" > /etc/hosts.deny
 
-# List all users with sudo access
-sudo_users=$(grep -Po '^sudo.+:\K.*$' /etc/group | tr ',' '\n')
-
-# Loop through each sudo user and remove them (except root)
-for user in $sudo_users; do
-    if [[ "$user" != "root" ]]; then
-        echo "Removing sudo privileges from: $user"
-        deluser "$user" sudo
-    fi
-done
-
-# Ensure only root exists in the sudoers file
-if [ -f /etc/sudoers ]; then
-    sed -i '/^%sudo/d' /etc/sudoers
-    echo "Defaults root ALL=(ALL) ALL" > /etc/sudoers.d/root_only
-fi
-
-# Remove any lingering sudo access from /etc/sudoers.d/
-find /etc/sudoers.d/ -type f ! -name "root_only" -exec rm -f {} \;
-
-echo "Sudo permissions cleanup complete."
-
 
 echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 echo "                     Firewall                           "
@@ -282,23 +260,6 @@ sudo freshclam
 
 
 echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-echo "            Diffing Stuff For Baselines                 "
-echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
-
-# Create DIFFING directory
-echo "Creating DIFFING directory..."
-sudo mkdir DIFFING
-# Generate baseline system information
-echo "Generating baseline data..."
-sudo lsof -i -n | grep "LISTEN" > DIFFING/portdiffingBASELINE.txt
-sudo ss -t state established > DIFFING/connectiondiffingBASELINE.txt
-sudo cat /root/.bashrc > DIFFING/alias_diffingBASELINE.txt
-sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELINE.txt
-for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
-sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
-
-
-echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 echo "                     Backups                            "
 echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
 
@@ -360,6 +321,7 @@ chmod 600 /etc/crontab
 #Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
+
 echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 echo "                  ITS TIME FOR NTP                      "
 echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
@@ -367,6 +329,25 @@ echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
 sudo yum install ntpdate -y
 ntpdate pool.ntp.org
 
+
+echo "\e[38;5;46m////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "            Diffing Stuff For Baselines                 "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\e[0m"
+
+# Create DIFFING directory
+echo "Creating DIFFING directory..."
+sudo mkdir DIFFING
+# Generate baseline system information
+echo "Generating baseline data..."
+sudo lsof -i -n | grep "LISTEN" > DIFFING/portdiffingBASELINE.txt
+sudo ss -t state established > DIFFING/connectiondiffingBASELINE.txt
+sudo cat /root/.bashrc > DIFFING/alias_diffingBASELINE.txt
+sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELINE.txt
+for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
+sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
+
 #Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
+
+sudo aide --init
 echo "FINISHED MAKE SURE YOU REBOOT"
