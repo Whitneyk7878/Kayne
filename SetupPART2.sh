@@ -131,6 +131,21 @@ else
   read -p "Enter the correct IP address: " IP_ADDR
 fi
 
+# Force sets the ip address and dns server
+# TODO: Test this works on every server
+cp /etc/network/interfaces $CCDC_ETC/interfaces
+cat <<EOF > /etc/network/interfaces
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address ${IP_ADDR}
+  netmask 255.255.255.0
+  gateway ${IP_ADDR%.*}.254
+  dns-nameserver 172.20.240.20 172.20.242.200 9.9.9.9
+EOF
+
 # Iptables
 IPTABLES_SCRIPT="$SCRIPT_DIR/linux/iptables.sh"
 cat <<EOF > $IPTABLES_SCRIPT
@@ -308,6 +323,8 @@ Outbound firewall rules
 fi
 
 
+
+
 if [[ ! -z "$IS_NTP_SERVER" ]] && type systemctl && type apt-get
 then
   # TODO: There are multiple ways to do NTP. We need to check what each server uses.
@@ -340,6 +357,10 @@ tos maxdist 30
 " > /etc/ntp.conf
 fi
 
+# Restart services
+if type systemctl
+then
+  systemctl restart sshd
   systemctl restart iptables
   # TODO: Verify service name
   systemctl restart ntp
@@ -347,16 +368,15 @@ fi
 
   # Disable other firewalls
   # (--now also runs a start/stop with the enable/disable)
-  systemctl disable firewalld
-  systemctl disable ufw
+  systemctl disable --now firewalld
+  systemctl disable --now ufw
 
   # Automatically apply IPTABLES_SCRIPT on boot
-  systemctl enable ccdc_firewall.service
-  systemctl start ccdc_firewall.service
+  systemctl enable --now ccdc_firewall.service
 
   # We want to use ntpd?
-  systemctl disable systemd-timesyncd.service
-  systemctl disable chronyd
+  systemctl disable --now systemd-timesyncd.service
+  systemctl disable --now chronyd
 else
   echo "!! non systemd systems are not supported !!"
   #exit
@@ -376,6 +396,7 @@ then
 fi
 
 echo "Now restart the machine to guarntee all changes apply"
+
 
 ####################################################################
 # Update system
