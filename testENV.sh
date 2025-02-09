@@ -29,19 +29,6 @@ sleep 5
 perl -npe 's/umask\s+0\d2/umask 077/g' -i /etc/bashrc
 perl -npe 's/umask\s+0\d2/umask 077/g' -i /etc/csh.cshrc
 sleep 5
-# Secure cron
-echo "Locking down Cron"
-touch /etc/cron.allow
-chmod 600 /etc/cron.allow
-awk -F: '{print $1}' /etc/passwd | grep -v root > /etc/cron.deny
-echo "Locking down AT"
-touch /etc/at.allow
-chmod 600 /etc/at.allow
-awk -F: '{print $1}' /etc/passwd | grep -v root > /etc/at.deny
-chmod 600 /etc/cron.deny
-chmod 600 /etc/at.deny
-chmod 600 /etc/crontab
-sleep 5
 # Sysctl Security 
 cat <<-EOF > /etc/sysctl.conf
 net.ipv4.ip_forward = 0
