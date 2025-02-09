@@ -415,7 +415,7 @@ fi
 
 echo "Now restart the machine to guarntee all changes apply"
 
-
+####################################################################
 # Update system
 echo "Updating and upgrading system packages..."
 #yum update -y && yum upgrade -y
@@ -434,10 +434,13 @@ touch /var/log/fail2banlog
 # Backup and configure fail2ban
 echo "Configuring fail2ban..."
 cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+# Putting in the contents to the jail file
+sed -i '/\[dovecot\]/a enabled = true\nmaxretry = 5\nbantime = 3600' /etc/fail2ban/jail.local
+sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2ban/jail.local
 # Restart fail2ban service
 echo "Restarting fail2ban service..."
 systemctl enable fail2ban
-systemctl start fail2ban
+systemctl restart fail2ban
 #THIS IS THE SECOND HALF FOR MONITORING
 # Update and install necessary packages
 echo "Installing required packages..."
