@@ -1,53 +1,10 @@
 #/bin/bash
-# Disable prelinking altogether for aide
-
-if grep -q ^PRELINKING /etc/sysconfig/prelink
-then
-  sed -i 's/PRELINKING.*/PRELINKING=no/g' /etc/sysconfig/prelink
-else
-  echo -e "\n# Set PRELINKING=no per security requirements" >> /etc/sysconfig/prelink
-  echo "PRELINKING=no" >> /etc/sysconfig/prelink
-fi
-sleep 5
-# Enable SHA512 password hashing
 authconfig --passalgo=sha512 —update
-
-# Set Last Login/Access Notification
-# Edit /etc/pam.d/system-auth, and add following line imeediatley after session required pam_limits.so: session       required     pam_lastlog.so showfailed
-
-if grep -q pam_lastlog.so /etc/pam.d/system-auth
-then
-    echo "pam_lastlog.so already in system-auth"
-else
-    echo "Adding pam_lastlog.so to system-auth..."
-    sed -i '/pam_limits.so/a session required pam_lastlog.so showfailed' /etc/pam.d/system-auth
-fi
 sleep 5
 # Disable Ctrl-Alt-Del Reboot Activation
 # change 'exec /sbin/shutdown -r now "Control-Alt-Delete pressed"' to 'exec /usr/bin/logger -p security.info "Control-Alt-Delete pressed"' in /etc/init/control-alt-delete.conf
-
-if grep -q "exec /usr/bin/logger -p security.info" /etc/init/control-alt-delete.conf
-then
-    echo "Control-Alt-Delete already disabled"
-else
-    echo "Disabling Control-Alt-Delete..."
-    sed -i 's/exec \/sbin\/shutdown -r now "Control-Alt-Delete pressed"/exec \/usr\/bin\/logger -p security.info "Control-Alt-Delete pressed"/g' /etc/init/control-alt-delete.conf
-fi
-sleep 5
-# secure grub by ensuring the permissions are set to 600
 chmod 600 /boot/grub2/grub.cfg
 sleep 5
-# Ensure SELinux is enabled and enforcing
-# Check if SELINUX is already set to enforcing
-if grep -q SELINUX=enforcing /etc/selinux/config
-then
-    echo "SELINUX already set to enforcing"
-else
-    echo "Setting SELINUX to enforcing..."
-    sed -i 's/SELINUX=disabled/SELINUX=enforcing/g' /etc/selinux/config
-fi
-sleep 5
-# REMOVE ALLL COMPILERS
 yum remove libgcc -y
 
 # Disable Support for RPC IPv6
