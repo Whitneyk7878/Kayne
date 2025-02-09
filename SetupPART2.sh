@@ -408,6 +408,14 @@ systemctl enable dovecot
 systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
+#############
+#DOVECOT WORK
+#############
+sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
+sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
+sudo systemctl restart dovecot
+
+
 # Install fail2ban
 echo "Installing fail2ban..."
 yum install -y fail2ban
