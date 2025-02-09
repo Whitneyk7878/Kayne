@@ -1,21 +1,14 @@
-# List all users with sudo access
-sudo_users=$(grep -Po '^sudo.+:\K.*$' /etc/group | tr ',' '\n')
+echo "Removing all users from the wheel group except root..."
 
-# Loop through each sudo user and remove them (except root)
-for user in $sudo_users; do
+# Get a list of all users in the wheel group
+wheel_users=$(grep '^wheel:' /etc/group | cut -d: -f4 | tr ',' '\n')
+
+# Loop through each user and remove them if they are not root
+for user in $wheel_users; do
     if [[ "$user" != "root" ]]; then
-        echo "Removing sudo privileges from: $user"
-        deluser "$user" sudo
+        echo "Removing $user from wheel group..."
+        gpasswd -d "$user" wheel
     fi
 done
 
-# Ensure only root exists in the sudoers file
-if [ -f /etc/sudoers ]; then
-    sed -i '/^%sudo/d' /etc/sudoers
-    echo "Defaults root ALL=(ALL) ALL" > /etc/sudoers.d/root_only
-fi
-
-# Remove any lingering sudo access from /etc/sudoers.d/
-find /etc/sudoers.d/ -type f ! -name "root_only" -exec rm -f {} \;
-
-echo "Sudo permissions cleanup complete."
+echo "Cleanup complete. Only root has sudo permissions now."
