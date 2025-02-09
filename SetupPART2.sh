@@ -86,21 +86,6 @@ then
 fi
 EOF
 
-# Create custom nologin script, nologin has been replaced with a login shell in some systems
-NOLOGIN=$SCRIPT_DIR/linux/nologin.sh
-cat <<EOF > $NOLOGIN
-#!/bin/bash
-echo "This account is unavailable."
-EOF
-chmod a=rx $NOLOGIN
-
-#removes the ability to log on of rogue users
-awk -F: "{ print \"usermod -s $NOLOGIN \" \$1; print \"passwd -l \" \$1 }" /etc/passwd >> $PASSWD_SH
-echo "usermod -s /bin/bash $username" >> $PASSWD_SH
-echo "passwd -u $username" >> $PASSWD_SH
-echo "usermod -s /bin/bash root" >> $PASSWD_SH
-echo "passwd -u root" >> $PASSWD_SH
-
 groupadd wheel
 groupadd sudo
 cp /etc/sudoers $CCDC_ETC/sudoers
