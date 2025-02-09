@@ -307,11 +307,6 @@ Outbound firewall rules
   echo 'No package manager found'
 fi
 
-# SSH Server config
-replace /etc ssh/sshd_config linux/sshd_config
-# Disable all keys - sshd_config will set the server to check this file
-mkdir -p /ccdc/ssh/
-touch /ccdc/ssh/authorized_keys
 
 if [[ ! -z "$IS_NTP_SERVER" ]] && type systemctl && type apt-get
 then
@@ -345,10 +340,6 @@ tos maxdist 30
 " > /etc/ntp.conf
 fi
 
-# Restart services
-if type systemctl
-then
-  systemctl restart sshd
   systemctl restart iptables
   # TODO: Verify service name
   systemctl restart ntp
