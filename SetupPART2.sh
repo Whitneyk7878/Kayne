@@ -236,16 +236,16 @@ systemctl enable dovecot
 systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
-#EXPERIMENTAL########################################
-#sudo yum install openssl -y
-#sudo mkdir -p /etc/dovecot/ssl
-#echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
-#sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
-#sudo chmod 600 /etc/dovecot/ssl/dovecot.pem
-#sudo chmod 600 /etc/dovecot/ssl/dovecot.crt
-
-
-#####################################################
+#Installing and configuring TLS
+sudo yum install openssl -y
+sudo mkdir -p /etc/dovecot/ssl
+echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
+sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
+sudo chmod 600 /etc/dovecot/ssl/dovecot.pem
+sudo chmod 600 /etc/dovecot/ssl/dovecot.crt
+sed -i 's|ssl_cert = </etc/pki/dovecot/certs/dovecot.pem|ssl_cert = </etc/dovecot/ssl/dovecot.crt|' /etc/dovecot/conf.d/10-ssl.conf
+sed -i 's|ssl_key = </etc/pki/dovecot/private/dovecot.pem|ssl_key = </etc/dovecot/ssl/dovecot.pem|' /etc/dovecot/conf.d/10-ssl.conf
+sed -i 's|#ssl_protocols = !SSLv2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|' /etc/dovecot/conf.d/10-ssl.conf
 sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
 sudo systemctl restart dovecot
