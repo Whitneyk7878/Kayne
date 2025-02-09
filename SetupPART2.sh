@@ -131,21 +131,6 @@ else
   read -p "Enter the correct IP address: " IP_ADDR
 fi
 
-# Force sets the ip address and dns server
-# TODO: Test this works on every server
-cp /etc/network/interfaces $CCDC_ETC/interfaces
-cat <<EOF > /etc/network/interfaces
-auto lo
-iface lo inet loopback
-
-auto eth0
-iface eth0 inet static
-  address ${IP_ADDR}
-  netmask 255.255.255.0
-  gateway ${IP_ADDR%.*}.254
-  dns-nameserver 172.20.240.20 172.20.242.200 9.9.9.9
-EOF
-
 # Iptables
 IPTABLES_SCRIPT="$SCRIPT_DIR/linux/iptables.sh"
 cat <<EOF > $IPTABLES_SCRIPT
