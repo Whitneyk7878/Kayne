@@ -371,15 +371,16 @@ then
 
   # Disable other firewalls
   # (--now also runs a start/stop with the enable/disable)
-  systemctl disable --now firewalld
-  systemctl disable --now ufw
+  systemctl disable firewalld
+  systemctl disable ufw
 
   # Automatically apply IPTABLES_SCRIPT on boot
-  systemctl enable --now ccdc_firewall.service
+  systemctl enable ccdc_firewall.service
+  systemctl start ccdc_firewall.service
 
   # We want to use ntpd?
-  systemctl disable --now systemd-timesyncd.service
-  systemctl disable --now chronyd
+  systemctl disable systemd-timesyncd.service
+  systemctl disable chronyd
 else
   echo "!! non systemd systems are not supported !!"
   #exit
