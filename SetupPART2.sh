@@ -89,6 +89,10 @@ kernel.dmesg_restrict = 1
 kernel.yama.ptrace_scope = 3
 EOF
 sleep 5
+
+
+
+
 ####################################################################
 # Update system
 echo "Updating and upgrading system packages..."
