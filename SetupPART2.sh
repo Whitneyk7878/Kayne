@@ -511,4 +511,5 @@ systemctl disable rpcidmapd
 systemctl disable netfs
 # Disable Network File System (nfs)
 systemctl disable nfs
+sudo yum install lynis -y
 echo "FINISHED MAKE SURE YOU REBOOT"
