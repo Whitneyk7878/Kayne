@@ -236,6 +236,16 @@ systemctl enable dovecot
 systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
+#EXPERIMENTAL########################################
+#sudo yum install openssl -y
+#sudo mkdir -p /etc/dovecot/ssl
+#echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
+#sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
+#sudo chmod 600 /etc/dovecot/ssl/dovecot.pem
+#sudo chmod 600 /etc/dovecot/ssl/dovecot.crt
+
+
+#####################################################
 sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
 sudo systemctl restart dovecot
