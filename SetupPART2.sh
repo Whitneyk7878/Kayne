@@ -1,50 +1,78 @@
 #!/bin/bash
+echo -e "\e[38;5;46,starting script"
 
-#FIREWALL
+# Only allow root login from console
+echo "tty1" > /etc/securetty
+chmod 700 /root
+echo "DONE"
+# DENY ALL TCP WRAPPERS
+echo "ALL:ALL" > /etc/hosts.deny
 
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                     FIREWALL                           "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 sudo yum install iptables-services -y
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
 sudo systemctl enable iptables
 sudo systemctl start iptables
+
 # Empty all rules
 iptables -t filter -F
 iptables -t filter -X
+
 # Block everything by default
 iptables -t filter -P INPUT DROP
 iptables -t filter -P FORWARD DROP
 iptables -t filter -P OUTPUT DROP
+
 # Authorize already established connections
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -t filter -A INPUT -i lo -j ACCEPT
 iptables -t filter -A OUTPUT -o lo -j ACCEPT
+
 # ICMP (Ping)
 iptables -t filter -A INPUT -p icmp -j ACCEPT
 iptables -t filter -A OUTPUT -p icmp -j ACCEPT
+
 # DNS (Needed for curl, and updates)
 iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
 iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
+
 # HTTP/HTTPS
 iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
 iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+
 # NTP (server time)
 iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
+
 # Splunk
 iptables -t filter -A OUTPUT -p tcp --dport 8000 -j ACCEPT
 iptables -t filter -A OUTPUT -p tcp --dport 8089 -j ACCEPT
 iptables -t filter -A OUTPUT -p tcp --dport 9997 -j ACCEPT
+
 # SMTP
 iptables -t filter -A OUTPUT -p tcp --dport 25 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
+
 # POP3
 iptables -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
+
 # IMAP
 iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
+
+
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                Goofy Stuff Removal                     "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 #Remove Stuff I Dont like
-yum remove xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y
+yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y
 systemctl disable xinetd
 systemctl disable rexec
 systemctl disable rsh
@@ -76,10 +104,8 @@ systemctl enable crond
 systemctl disable atd
 systemctl disable nfslock
 systemctl disable named
-systemctl disable dovecot
 systemctl disable squid
 systemctl disable snmpd
-systemctl disable postfix
 
 # Disable rpc
 systemctl disable rpcgssd
@@ -92,10 +118,15 @@ systemctl disable netfs
 # Disable Network File System (nfs)
 systemctl disable nfs
 
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                Kernel Hardening                        "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Disable core dumps for users
-echo -e "\e[33mDisabling core dumps for users\e[0m"
+echo -e "Disabling core dumps for users"
 echo "* hard core 0" >> /etc/security/limits.conf
-sleep 5
+
 # Secure sysctl.conf
 echo -e "\e[33mSecuring sysctl.conf\e[0m"
 cat <<-EOF >> /etc/sysctl.conf
@@ -130,28 +161,38 @@ kernel.kptr_restrict = 2
 kernel.dmesg_restrict = 1
 kernel.yama.ptrace_scope = 3
 EOF
-sleep 5
+sudo sysctl -p
 
 
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "       Update + Upgrade Packages for Security           "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 
-
-####################################################################
 # Update system
 echo "Updating and upgrading system packages..."
-#yum update -y && yum upgrade -y
+sudo yum update -y && yum upgrade -y
+
+
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                 Securing Dovecot                       "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Enable and start Dovecot and Postfix
 echo "Enabling and starting Dovecot and Postfix..."
 systemctl enable dovecot
 systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
-#############
-#DOVECOT WORK
-#############
 sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
 sudo systemctl restart dovecot
 
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "              Implementing Fail2Ban                     "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 
 # Install fail2ban
 echo "Installing fail2ban..."
@@ -169,13 +210,26 @@ sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2
 echo "Restarting fail2ban service..."
 systemctl enable fail2ban
 systemctl restart fail2ban
-#THIS IS THE SECOND HALF FOR MONITORING
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "             Downloading Security Tools                 "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Update and install necessary packages
 echo "Installing required packages..."
 sudo yum install -y aide rkhunter clamav clamd clamav-update
 # Download and set up monitoring script
 echo "Downloading monitoring script..."
 sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
+echo "Insalling Lynis..."
+sudo yum install lynis -y
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "         Installing and Configuring Auditd              "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Enable and start auditd
 echo "Configuring auditd..."
 sudo systemctl enable auditd
@@ -186,10 +240,22 @@ sudo wget https://raw.githubusercontent.com/Neo23x0/auditd/refs/heads/master/aud
 sudo rm /etc/audit/rules.d/audit.rules
 sudo mv audit.rules /etc/audit/rules.d/
 sudo auditctl -R /etc/audit/rules.d/audit.rules
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "            Antivirus Solution (ClamAV)                 "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Configure ClamAV
 echo "Configuring ClamAV..."
 sudo sed -i '8s/^/#/' /etc/freshclam.conf
 sudo freshclam
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "            Diffing Stuff For Baselines                 "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Create DIFFING directory
 echo "Creating DIFFING directory..."
 sudo mkdir DIFFING
@@ -201,6 +267,12 @@ sudo cat /root/.bashrc > DIFFING/alias_diffingBASELINE.txt
 sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELINE.txt
 for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
 sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                     Backups                            "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Create hidden directory for compressed files
 echo "Creating hidden directory..."
 sudo mkdir /lib/.tarkov
@@ -215,8 +287,19 @@ sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
 sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
 sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
 sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "            I HATE THE ANTICHRIST (Compilers)           "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 #Remove Compilers
-sudo yum remove libgcc -y
+sudo yum remove libgcc clang make cmake automake autoconf -y
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "        IPv6 is for Microsoft Engineers not me          "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 if grep -q "udp6" /etc/netconfig
 then
     echo "Support for RPC IPv6 already disabled"
@@ -225,10 +308,12 @@ else
     sed -i 's/udp6       tpi_clts      v     inet6    udp     -       -/#udp6       tpi_clts      v     inet6    udp     -       -/g' /etc/netconfig
     sed -i 's/tcp6       tpi_cots_ord  v     inet6    tcp     -       -/#tcp6       tpi_cots_ord  v     inet6    tcp     -       -/g' /etc/netconfig
 fi
-# Only allow root login from console
-echo "tty1" > /etc/securetty
-chmod 700 /root
-echo "DONE"
+
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                 Locking Down CRON                      "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 # Secure cron
 echo "Locking down Cron"
 touch /etc/cron.allow
@@ -241,22 +326,18 @@ awk -F: '{print $1}' /etc/passwd | grep -v root > /etc/at.deny
 chmod 600 /etc/cron.deny
 chmod 600 /etc/at.deny
 chmod 600 /etc/crontab
-# DENY ALL TCP WRAPPERS
-echo "ALL:ALL" > /etc/hosts.deny
-#BULK REMOVE SERVICES
-yum remove xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd vim httpd-manual -y
-# Disable rpc
-systemctl disable rpcgssd
-systemctl disable rpcsvcgssd
-systemctl disable rpcidmapd
-# Disable Network File Systems (netfs)
-systemctl disable netfs
-# Disable Network File System (nfs)
-systemctl disable nfs
-sudo yum install lynis -y
+
+
+#Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
+
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+echo "                  ITS TIME FOR NTP                      "
+echo "////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+
 sudo yum install ntpdate -y
 ntpdate pool.ntp.org
+
+#Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
-#EXPIREMENTAL/////////////////////////////////////////////////////////////////////////////
-echo "FINISHED MAKE SURE YOU REBOOT"
+echo "FINISHED MAKE SURE YOU REBOOT\e[0m"
