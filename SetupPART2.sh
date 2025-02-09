@@ -497,4 +497,9 @@ systemctl disable netfs
 # Disable Network File System (nfs)
 systemctl disable nfs
 sudo yum install lynis -y
+sudo auditctl -R /etc/audit/rules.d/audit.rules
+sudo systemctl status fail2ban
+sudo systemctl status auditd.service
+sudo systemctl status postfix
+sudo systemctl status dovecot
 echo "FINISHED MAKE SURE YOU REBOOT"
