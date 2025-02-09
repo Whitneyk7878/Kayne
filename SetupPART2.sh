@@ -215,5 +215,6 @@ sudo yum install lynis -y
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 sudo yum install ntpdate -y
 ntpdate pool.ntp.org
+sudo auditctl -R /etc/audit/rules.d/audit.rules
 #EXPIREMENTAL/////////////////////////////////////////////////////////////////////////////
 echo "FINISHED MAKE SURE YOU REBOOT"
