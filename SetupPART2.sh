@@ -1,4 +1,11 @@
-sudo yum #!/bin/bash
+#!/bin/bash
+# __ __       _  _   ___        _            
+#|  \  \ ___ <_>| | / __> ___ _| |_ _ _  ___ 
+#|     |<_> || || | \__ \/ ._> | | | | || . \
+#|_|_|_|<___||_||_| <___/\___. |_| `___||  _/
+#                                       |_|  
+# Written By Kayne
+
 echo -e "starting script"
 
 
@@ -192,7 +199,7 @@ echo -e "Disabling core dumps for users"
 echo "* hard core 0" >> /etc/security/limits.conf
 
 # Secure sysctl.conf
-echo -e "\e[33mSecuring sysctl.conf\e[0m"
+echo -e "Securing sysctl.conf"
 cat <<-EOF >> /etc/sysctl.conf
 fs.suid_dumpable = 0
 kernel.exec_shield = 1
@@ -221,7 +228,7 @@ net.ipv4.conf.default.log_martians = 1
 net.core.bpf_jit_harden = 2
 kernel.sysrq = 0
 kernel.perf_event_paranoid = 3
-kernel.kptr_restrict = 2
+kernel.kptr_restrict = 1
 kernel.dmesg_restrict = 1
 kernel.yama.ptrace_scope = 3
 EOF
@@ -422,4 +429,6 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 sudo aide --init
 sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-echo "FINISHED MAKE SURE YOU REBOOT"
+echo "SCRIPT HAS FINISHED RUNNING... REBOOTING.."
+sleep 1
+sudo reboot
