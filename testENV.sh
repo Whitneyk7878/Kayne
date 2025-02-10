@@ -58,3 +58,6 @@ iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
+
+sudo systemctl restart iptables
+sudo systemctl enable iptables
