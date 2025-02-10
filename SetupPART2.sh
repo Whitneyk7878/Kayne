@@ -5,7 +5,7 @@ echo -e "starting script"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m             General Security Measures                      \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Only allow root login from console
 echo "tty1" > /etc/securetty
 chmod 700 /root
@@ -62,6 +62,7 @@ done
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Firewall                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
 sudo yum install iptables-services -y
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
@@ -115,48 +116,56 @@ iptables -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
 iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 
-
+#make sure only one firewall installed
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Stuff Removal                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 #Remove Stuff I Dont like
 yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y
-systemctl disable xinetd
-systemctl disable rexec
-systemctl disable rsh
-systemctl disable rlogin
-systemctl disable ypbind
-systemctl disable tftp
-systemctl disable certmonger
-systemctl disable cgconfig
-systemctl disable cgred
-systemctl disable cpuspeed
-systemctl enable irqbalance
-systemctl disable kdump
-systemctl disable mdmonitor
-systemctl disable messagebus
-systemctl disable netconsole
-systemctl disable ntpdate
-systemctl disable oddjobd
-systemctl disable portreserve
-systemctl enable psacct
-systemctl disable qpidd
-systemctl disable quota_nld
-systemctl disable rdisc
-systemctl disable rhnsd
-systemctl disable rhsmcertd
-systemctl disable saslauthd
-systemctl disable smartd
-systemctl disable sysstat
-systemctl enable crond
-systemctl disable atd
-systemctl disable nfslock
-systemctl disable named
-systemctl disable squid
-systemctl disable snmpd
+sudo systemctl stop xinetd && sudo systemctl disable xinetd
+sudo systemctl stop rexec && sudo systemctl disable rexec
+sudo systemctl stop rsh && sudo systemctl disable rsh
+sudo systemctl stop rlogin && sudo systemctl disable rlogin
+sudo systemctl stop ypbind && sudo systemctl disable ypbind
+sudo systemctl stop tftp && sudo systemctl disable tftp
+sudo systemctl stop certmonger && sudo systemctl disable certmonger
+sudo systemctl stop cgconfig && sudo systemctl disable cgconfig
+sudo systemctl stop cgred && sudo systemctl disable cgred
+sudo systemctl stop cpuspeed && sudo systemctl disable cpuspeed
+sudo systemctl stop irqbalance && sudo systemctl enable irqbalance
+sudo systemctl stop kdump && sudo systemctl disable kdump
+sudo systemctl stop mdmonitor && sudo systemctl disable mdmonitor
+sudo systemctl stop messagebus && sudo systemctl disable messagebus
+sudo systemctl stop netconsole && sudo systemctl disable netconsole
+sudo systemctl stop ntpdate && sudo systemctl disable ntpdate
+sudo systemctl stop oddjobd && sudo systemctl disable oddjobd
+sudo systemctl stop portreserve && sudo systemctl disable portreserve
+sudo systemctl stop psacct && sudo systemctl enable psacct
+sudo systemctl stop qpidd && sudo systemctl disable qpidd
+sudo systemctl stop quota_nld && sudo systemctl disable quota_nld
+sudo systemctl stop rdisc && sudo systemctl disable rdisc
+sudo systemctl stop rhnsd && sudo systemctl disable rhnsd
+sudo systemctl stop rhsmcertd && sudo systemctl disable rhsmcertd
+sudo systemctl stop saslauthd && sudo systemctl disable saslauthd
+sudo systemctl stop smartd && sudo systemctl disable smartd
+sudo systemctl stop sysstat && sudo systemctl disable sysstat
+sudo systemctl stop crond && sudo systemctl enable crond
+sudo systemctl stop atd && sudo systemctl disable atd
+sudo systemctl stop nfslock && sudo systemctl disable nfslock
+sudo systemctl stop named && sudo systemctl disable named
+sudo systemctl stop squid && sudo systemctl disable squid
+sudo systemctl stop snmpd && sudo systemctl disable snmpd
+sudo systemctl stop mariadb && sudo systemctl disable mariadb
+sudo systemctl stop mysql && sudo systemctl disable mysql
+sudo systemctl stop postgresql && sudo systemctl disable postgresql
+sudo systemctl stop httpd && sudo systemctl disable httpd
+sudo systemctl stop nginx && sudo systemctl disable nginx
+sudo systemctl stop php-fpm && sudo systemctl disable php-fpm
 
 # Disable rpc
 systemctl disable rpcgssd
@@ -169,11 +178,14 @@ systemctl disable netfs
 # Disable Network File System (nfs)
 systemctl disable nfs
 
+#Remove hacker coding languages
+sudo yum remove -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
+
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Kernel Hardening                       \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Disable core dumps for users
 echo -e "Disabling core dumps for users"
 echo "* hard core 0" >> /etc/security/limits.conf
@@ -218,7 +230,7 @@ sudo sysctl -p
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Update + Upgrade                       \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Update system
 echo "Updating and upgrading system packages..."
 sudo yum update -y && yum upgrade -y
@@ -229,7 +241,7 @@ sudo yum update -y && yum upgrade -y
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Dovecot                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Enable and start Dovecot and Postfix
 echo "Enabling and starting Dovecot and Postfix..."
 systemctl enable dovecot
@@ -254,7 +266,7 @@ sudo systemctl restart dovecot
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Install fail2ban
 echo "Installing fail2ban..."
 yum install -y fail2ban
@@ -276,7 +288,7 @@ systemctl restart fail2ban
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Downloading Security Tools              \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Update and install necessary packages
 echo "Installing required packages..."
 sudo yum install -y aide rkhunter clamav clamd clamav-update
@@ -290,7 +302,7 @@ sudo yum install lynis -y
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     AuditD                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Enable and start auditd
 echo "Configuring auditd..."
 sudo systemctl enable auditd
@@ -306,7 +318,7 @@ sudo auditctl -R /etc/audit/rules.d/audit.rules
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     CLAMAV                           \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Configure ClamAV
 echo "Configuring ClamAV..."
 sudo sed -i '8s/^/#/' /etc/freshclam.conf
@@ -316,7 +328,7 @@ sudo freshclam
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Backups                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Create hidden directory for compressed files
 echo "Creating hidden directory..."
 sudo mkdir /lib/.tarkov
@@ -335,7 +347,7 @@ sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 #Remove Compilers
 sudo yum remove libgcc clang make cmake automake autoconf -y
 
@@ -343,7 +355,7 @@ sudo yum remove libgcc clang make cmake automake autoconf -y
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m        IPv6 is for Microsoft Engineers not me        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 if grep -q "udp6" /etc/netconfig
 then
     echo "Support for RPC IPv6 already disabled"
@@ -357,7 +369,7 @@ fi
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                   Cron Lockdown                      \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Secure cron
 echo "Locking down Cron"
 touch /etc/cron.allow
@@ -379,7 +391,7 @@ sudo auditctl -R /etc/audit/rules.d/audit.rules
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     NTP                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 sudo yum install ntpdate -y
 ntpdate pool.ntp.org
 
@@ -387,7 +399,7 @@ ntpdate pool.ntp.org
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m             Diffing for Baselines                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-
+sleep 1
 # Create DIFFING directory
 echo "Creating DIFFING directory..."
 sudo mkdir DIFFING
