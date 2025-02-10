@@ -120,6 +120,7 @@ sudo iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
 
+sudo iptables-save | sudo tee /etc/sysconfig/iptables
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Stuff Removal                         \e[0m"
@@ -137,7 +138,7 @@ sudo systemctl stop certmonger && sudo systemctl disable certmonger
 sudo systemctl stop cgconfig && sudo systemctl disable cgconfig
 sudo systemctl stop cgred && sudo systemctl disable cgred
 sudo systemctl stop cpuspeed && sudo systemctl disable cpuspeed
-sudo systemctl stop irqbalance && sudo systemctl enable irqbalance
+sudo systemctl start irqbalance && sudo systemctl enable irqbalance
 sudo systemctl stop kdump && sudo systemctl disable kdump
 sudo systemctl stop mdmonitor && sudo systemctl disable mdmonitor
 sudo systemctl stop messagebus && sudo systemctl disable messagebus
@@ -145,7 +146,7 @@ sudo systemctl stop netconsole && sudo systemctl disable netconsole
 sudo systemctl stop ntpdate && sudo systemctl disable ntpdate
 sudo systemctl stop oddjobd && sudo systemctl disable oddjobd
 sudo systemctl stop portreserve && sudo systemctl disable portreserve
-sudo systemctl stop psacct && sudo systemctl enable psacct
+sudo systemctl start psacct && sudo systemctl enable psacct
 sudo systemctl stop qpidd && sudo systemctl disable qpidd
 sudo systemctl stop quota_nld && sudo systemctl disable quota_nld
 sudo systemctl stop rdisc && sudo systemctl disable rdisc
@@ -154,7 +155,7 @@ sudo systemctl stop rhsmcertd && sudo systemctl disable rhsmcertd
 sudo systemctl stop saslauthd && sudo systemctl disable saslauthd
 sudo systemctl stop smartd && sudo systemctl disable smartd
 sudo systemctl stop sysstat && sudo systemctl disable sysstat
-sudo systemctl stop crond && sudo systemctl enable crond
+sudo systemctl start crond && sudo systemctl enable crond
 sudo systemctl stop atd && sudo systemctl disable atd
 sudo systemctl stop nfslock && sudo systemctl disable nfslock
 sudo systemctl stop named && sudo systemctl disable named
