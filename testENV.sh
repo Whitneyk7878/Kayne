@@ -50,7 +50,11 @@ iptables -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
 # POP3
 iptables -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
+iptables -t filter -A OUTPUT -p udp --dport 110 -j ACCEPT
+iptables -t filter -A INPUT -p udp --dport 110 -j ACCEPT
 
 # IMAP
 iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
+iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
+iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
