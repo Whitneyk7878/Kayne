@@ -52,6 +52,9 @@ sudo firewall-cmd --permanent --add-service=imap
 # Reload Firewalld to apply all changes
 sudo firewall-cmd --reload
 
+# Restart service
+sudo systemctl restart firewalld
+
 # Display the active Firewalld configuration
 sudo firewall-cmd --list-all
 
