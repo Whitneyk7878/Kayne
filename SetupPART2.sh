@@ -234,7 +234,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update system
 echo "Updating and upgrading system packages..."
-#sudo yum update -y && yum upgrade -y
+sudo yum update -y && yum upgrade -y
 
 
 
@@ -420,6 +420,6 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-#sudo aide --init
-#sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+sudo aide --init
+sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 echo "FINISHED MAKE SURE YOU REBOOT"
