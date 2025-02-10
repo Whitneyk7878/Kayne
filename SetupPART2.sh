@@ -233,7 +233,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update system
 echo "Updating and upgrading system packages..."
-sudo yum update -y && yum upgrade -y
+#sudo yum update -y && yum upgrade -y
 
 
 
