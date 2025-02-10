@@ -1,60 +1,58 @@
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m                     Firewall                         \e[0m"
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-sleep 1
-sudo yum install iptables-services -y
-sudo systemctl stop firewalld
-sudo systemctl disable firewalld
-sudo systemctl enable iptables
-sudo systemctl start iptables
+sudo systemctl enable firewalld
+sudo systemctl start firewalld
 
-# Empty all rules
-iptables -t filter -F
-iptables -t filter -X
+#!/bin/bash
 
-# Block everything by default
-iptables -t filter -P INPUT DROP
-iptables -t filter -P FORWARD DROP
-iptables -t filter -P OUTPUT DROP
+# Reset all Firewalld rules
+sudo firewall-cmd --permanent --reset
+sudo firewall-cmd --reload
 
-# Authorize already established connections
-iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -t filter -A INPUT -i lo -j ACCEPT
-iptables -t filter -A OUTPUT -o lo -j ACCEPT
+# Set default policy to block all incoming and forwarded packets
+sudo firewall-cmd --set-default-zone=drop
 
-# ICMP (Ping)
-iptables -t filter -A INPUT -p icmp -j ACCEPT
-iptables -t filter -A OUTPUT -p icmp -j ACCEPT
+# Drop all outgoing packets by default (if needed)
+sudo firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -j DROP
 
-# DNS (Needed for curl, and updates)
-iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
-iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
+# Allow already established and related connections
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" connection state="RELATED,ESTABLISHED" accept'
 
-# HTTP/HTTPS
-iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+# Allow all loopback traffic
+sudo firewall-cmd --permanent --add-interface=lo
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="127.0.0.1" accept'
 
-# NTP (server time)
-iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
+# Allow ICMP (Ping)
+sudo firewall-cmd --permanent --add-icmp-block-inversion
+sudo firewall-cmd --permanent --add-icmp-block=echo-reply
 
-# Splunk
-iptables -t filter -A OUTPUT -p tcp --dport 8000 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp --dport 8089 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp --dport 9997 -j ACCEPT
+# Allow DNS (Required for updates and curl - TCP & UDP on port 53)
+sudo firewall-cmd --permanent --add-port=53/tcp
+sudo firewall-cmd --permanent --add-port=53/udp
 
-# SMTP
-iptables -t filter -A OUTPUT -p tcp --dport 25 -j ACCEPT
-iptables -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
+# Allow HTTP and HTTPS traffic
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
 
-# POP3
-iptables -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
-iptables -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
+# Allow NTP (Network Time Protocol - Syncs server time)
+sudo firewall-cmd --permanent --add-service=ntp
 
-# IMAP
-iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
-iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
+# Allow Splunk traffic (Ports 8000, 8089, 9997)
+sudo firewall-cmd --permanent --add-port=8000/tcp
+sudo firewall-cmd --permanent --add-port=8089/tcp
+sudo firewall-cmd --permanent --add-port=9997/tcp
 
-#make sure only one firewall installed
-sudo systemctl stop firewalld
-sudo systemctl disable firewalld
+# Allow SMTP (Mail - Port 25)
+sudo firewall-cmd --permanent --add-service=smtp
+
+# Allow POP3 (Mail retrieval - Port 110)
+sudo firewall-cmd --permanent --add-service=pop3
+
+# Allow IMAP (Mail retrieval - Port 143)
+sudo firewall-cmd --permanent --add-service=imap
+
+# Reload Firewalld to apply all changes
+sudo firewall-cmd --reload
+
+# Display the active Firewalld configuration
+sudo firewall-cmd --list-all
+
+
