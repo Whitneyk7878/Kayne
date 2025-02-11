@@ -270,6 +270,25 @@ sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dove
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
 sudo systemctl restart dovecot
 
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m                  Securing Postfix                    \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+
+######################################################NOT FINISHED###########################################
+echo "Installing OpenSSL and configuring it..."
+sudo mkdir -p /etc/postfix/ssl
+#Name doesnt matter on this one for the keys
+sudo openssl genpkey -algorithm RSA -out ccdc.key -pkeyopt rsa_keygen_bits:4096
+sudo mv *.key /etc/postfix/ssl/
+# THE KEY SHOULD BE THE KEY GENERATED EARLIER
+sudo openssl req -new -key /etc/postfix/ssl/ccdc.key -out ccdc.csr
+sudo mv *.csr /etc/postfix/ssl/
+postconf -e 'smtpd_use_tls = yes'
+postconf -e 'smtpd_tls_auth_only = yes'
+postconf -e 'smtpd_tls_key_file = /etc/postfix/ssl/ccdc.key'
+postconf -e 'smtpd_tls_cert_file = /etc/postfix/ssl/mail.ccdclab.net.crt'
+postconf -e 'smtpd_tls_loglevel = 1'
+sudo systemctl restart postfix
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
