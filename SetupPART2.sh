@@ -6,8 +6,6 @@
 #                                       |_|  
 # Written By Kayne
 
-echo -e "starting script"
-
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m             General Security Measures                      \e[0m"
@@ -70,7 +68,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Firewall                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-sudo yum install iptables-services -y
+sudo yum install iptables-services -y -q
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
 sudo systemctl enable iptables
@@ -187,7 +185,7 @@ systemctl disable netfs
 systemctl disable nfs
 
 #Remove hacker coding languages
-sudo yum remove -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
+sudo yum remove -q -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -241,7 +239,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update system
 echo "Updating and upgrading system packages..."
-sudo yum update -y && yum upgrade -y
+sudo yum update -y -q && yum upgrade -y -q
 
 
 
@@ -257,7 +255,7 @@ systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
 #Installing and configuring TLS
-sudo yum install openssl -y
+sudo yum install openssl -y -q
 sudo mkdir -p /etc/dovecot/ssl
 echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
 sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
@@ -296,7 +294,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Install fail2ban
 echo "Installing fail2ban..."
-yum install -y fail2ban
+yum install -y -q fail2ban
 # Create fail2ban log file
 echo "Creating fail2ban log file..."
 touch /var/log/fail2banlog
@@ -318,12 +316,12 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update and install necessary packages
 echo "Installing required packages..."
-sudo yum install -y aide rkhunter clamav clamd clamav-update
+sudo yum install -y -q aide rkhunter clamav clamd clamav-update
 # Download and set up monitoring script
 echo "Downloading monitoring script..."
 sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
 echo "Insalling Lynis..."
-sudo yum install lynis -y
+sudo yum install lynis -y -q
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -376,7 +374,7 @@ echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 #Remove Compilers
-sudo yum remove libgcc clang make cmake automake autoconf -y
+sudo yum remove libgcc clang make cmake automake autoconf -y -q
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -419,7 +417,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     NTP                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-sudo yum install ntpdate -y
+sudo yum install ntpdate -y -q
 ntpdate pool.ntp.org
 
 
