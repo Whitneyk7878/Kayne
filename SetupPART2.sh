@@ -285,9 +285,6 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Postfix                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-
-
-######################################################FOR TLS###########################################
 #echo "Installing OpenSSL and configuring it..."
 #sudo mkdir -p /etc/postfix/ssl
 #Name doesnt matter on this one for the keys
@@ -473,6 +470,50 @@ sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
 
 #Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
+
+
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m                 Installing RITA                      \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+
+#echo "Installing RITA for C2 detection (this may take a while).."
+#sudo wget https://github.com/activecm/rita/releases/download/v5.0.8/install-rita-zeek-here.sh
+#sudo bash install-rita-zeek-here.sh
+#sudo touch rita-roll
+#sudo echo -e "#!/bin/bash\nscreen -S ritaimport -d -m /usr/local/bin/rita import --rolling -l /opt/zeek/logs/ -d rolling\n" > rita-roll
+#sudo chmod +x rita-roll
+#sudo touch rita /etc/cron.d
+# THIS CRON JOB IMPORTS ZEEK STUFF EVERY 2 MINUTES
+#sudo echo "*/2 * * * * root /opt/rita/rita-roll" > /etc/cron.d/rita
+# RESOURCE: https://www.youtube.com/watch?v=oP5xYq0_44E&pp=ygURcml0YSBpbnN0YWxsYXRpb24%3D
+# RESOURCE: https://www.youtube.com/watch?v=tRlzVNG2sGQ
+# COMMAND to run: zeek start && rita view rolling
+
+
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m              Installing Suricata IDS                 \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+
+echo "installing suricata.."
+sudo yum install suricata -y -q
+echo "Installing the latest emerging threats rules.."
+sudo wget https://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz -O /tmp/emerging.rules.tar.gz
+sudo tar -xvzf /tmp/emerging.rules.tar.gz -C /etc/suricata/
+sudo systemctl enable suricata
+sudo systemctl start suricata
+
+
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m                    TripWire                          \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+
+#echo "installing tripwire"
+#sudo yum install tripwire -y -q
+#echo "fill out the information to sign policies and configurations.."
+#sudo tripwire-setup-keyfiles
+#echo "initialize the database..."
+#sudo tripwire --init
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
