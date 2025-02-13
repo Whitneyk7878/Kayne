@@ -143,7 +143,7 @@ sudo systemctl stop certmonger && sudo systemctl disable certmonger
 sudo systemctl stop cgconfig && sudo systemctl disable cgconfig
 sudo systemctl stop cgred && sudo systemctl disable cgred
 sudo systemctl stop cpuspeed && sudo systemctl disable cpuspeed
-sudo systemctl start irqbalance && sudo systemctl enable irqbalance
+sudo systemctl stop irqbalance && sudo systemctl disable irqbalance
 sudo systemctl stop kdump && sudo systemctl disable kdump
 sudo systemctl stop mdmonitor && sudo systemctl disable mdmonitor
 sudo systemctl stop messagebus && sudo systemctl disable messagebus
@@ -151,7 +151,6 @@ sudo systemctl stop netconsole && sudo systemctl disable netconsole
 sudo systemctl stop ntpdate && sudo systemctl disable ntpdate
 sudo systemctl stop oddjobd && sudo systemctl disable oddjobd
 sudo systemctl stop portreserve && sudo systemctl disable portreserve
-sudo systemctl start psacct && sudo systemctl enable psacct
 sudo systemctl stop qpidd && sudo systemctl disable qpidd
 sudo systemctl stop quota_nld && sudo systemctl disable quota_nld
 sudo systemctl stop rdisc && sudo systemctl disable rdisc
@@ -160,23 +159,22 @@ sudo systemctl stop rhsmcertd && sudo systemctl disable rhsmcertd
 sudo systemctl stop saslauthd && sudo systemctl disable saslauthd
 sudo systemctl stop smartd && sudo systemctl disable smartd
 sudo systemctl stop sysstat && sudo systemctl disable sysstat
-sudo systemctl start crond && sudo systemctl enable crond
 sudo systemctl stop atd && sudo systemctl disable atd
 sudo systemctl stop nfslock && sudo systemctl disable nfslock
 sudo systemctl stop named && sudo systemctl disable named
 sudo systemctl stop squid && sudo systemctl disable squid
 sudo systemctl stop snmpd && sudo systemctl disable snmpd
-sudo systemctl stop mariadb && sudo systemctl disable mariadb
-sudo systemctl stop mysql && sudo systemctl disable mysql
+#sudo systemctl stop mariadb && sudo systemctl disable mariadb
+#sudo systemctl stop mysql && sudo systemctl disable mysql
 sudo systemctl stop postgresql && sudo systemctl disable postgresql
-sudo systemctl stop httpd && sudo systemctl disable httpd
+#sudo systemctl stop httpd && sudo systemctl disable httpd
 sudo systemctl stop nginx && sudo systemctl disable nginx
 sudo systemctl stop php-fpm && sudo systemctl disable php-fpm
-
-# Disable rpc
-systemctl disable rpcgssd
-systemctl disable rpcsvcgssd
-systemctl disable rpcidmapd
+#THESE ARE SPECIFIC TO THE COMP ENVIRONMENT 2/12/2025
+sudo systemctl stop cockpit.s && sudo systemctl disable cockpit.s
+sudo systemctl stop rpcgssd && sudo systemctl disable rpcgssd
+sudo systemctl stop rpcsvcgssd && sudo systemctl disable rpcsvcgssd
+sudo systemctl stop rpcidmapd && sudo systemctl disable rpcidmapd
 
 # Disable Network File Systems (netfs)
 systemctl disable netfs
@@ -185,7 +183,9 @@ systemctl disable netfs
 systemctl disable nfs
 
 #Remove hacker coding languages
-sudo yum remove -q -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
+#sudo yum remove -q -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
+#THIS IS FOR COMP
+sudo yum remove -q -y ruby* java* perl* python* nodejs*
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -255,38 +255,41 @@ systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
 #Installing and configuring TLS
-sudo yum install openssl -y -q
-sudo mkdir -p /etc/dovecot/ssl
-echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
-sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
-sudo chmod 600 /etc/dovecot/ssl/dovecot.pem
-sudo chmod 600 /etc/dovecot/ssl/dovecot.crt
-sed -i 's|ssl_cert = </etc/pki/dovecot/certs/dovecot.pem|ssl_cert = </etc/dovecot/ssl/dovecot.crt|' /etc/dovecot/conf.d/10-ssl.conf
-sed -i 's|ssl_key = </etc/pki/dovecot/private/dovecot.pem|ssl_key = </etc/dovecot/ssl/dovecot.pem|' /etc/dovecot/conf.d/10-ssl.conf
-sed -i 's|#ssl_protocols = !SSLv2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|' /etc/dovecot/conf.d/10-ssl.conf
+#sudo yum install openssl -y -q
+#sudo mkdir -p /etc/dovecot/ssl
+#echo -e "ENTER INFORMATION FOR TLS CERTIFICATE"
+#sudo openssl req -x509 -newkey rsa:4096 -keyout /etc/dovecot/ssl/dovecot.pem -out /etc/dovecot/ssl/dovecot.crt -days 365 -nodes
+#sudo chmod 600 /etc/dovecot/ssl/dovecot.pem
+#sudo chmod 600 /etc/dovecot/ssl/dovecot.crt
+#sed -i 's|ssl_cert = </etc/pki/dovecot/certs/dovecot.pem|ssl_cert = </etc/dovecot/ssl/dovecot.crt|' /etc/dovecot/conf.d/10-ssl.conf
+#sed -i 's|ssl_key = </etc/pki/dovecot/private/dovecot.pem|ssl_key = </etc/dovecot/ssl/dovecot.pem|' /etc/dovecot/conf.d/10-ssl.conf
+#sed -i 's|#ssl_protocols = !SSLv2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|' /etc/dovecot/conf.d/10-ssl.conf
 sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
+
 sudo systemctl restart dovecot
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Postfix                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-######################################################NOT FINISHED###########################################
-echo "Installing OpenSSL and configuring it..."
-sudo mkdir -p /etc/postfix/ssl
+
+
+######################################################FOR TLS###########################################
+#echo "Installing OpenSSL and configuring it..."
+#sudo mkdir -p /etc/postfix/ssl
 #Name doesnt matter on this one for the keys
-sudo openssl genpkey -algorithm RSA -out ccdc.key -pkeyopt rsa_keygen_bits:4096
-sudo mv *.key /etc/postfix/ssl/
+#sudo openssl genpkey -algorithm RSA -out ccdc.key -pkeyopt rsa_keygen_bits:4096
+#sudo mv *.key /etc/postfix/ssl/
 # THE KEY SHOULD BE THE KEY GENERATED EARLIER
-sudo openssl req -new -key /etc/postfix/ssl/ccdc.key -out ccdc.csr
-sudo mv *.csr /etc/postfix/ssl/
-postconf -e 'smtpd_use_tls = yes'
-postconf -e 'smtpd_tls_auth_only = yes'
-postconf -e 'smtpd_tls_key_file = /etc/postfix/ssl/ccdc.key'
-postconf -e 'smtpd_tls_cert_file = /etc/postfix/ssl/mail.ccdclab.net.crt'
-postconf -e 'smtpd_tls_loglevel = 1'
-sudo systemctl restart postfix
+#sudo openssl req -new -key /etc/postfix/ssl/ccdc.key -out ccdc.csr
+#sudo mv *.csr /etc/postfix/ssl/
+#postconf -e 'smtpd_use_tls = yes'
+#postconf -e 'smtpd_tls_auth_only = yes'
+#postconf -e 'smtpd_tls_key_file = /etc/postfix/ssl/ccdc.key'
+#postconf -e 'smtpd_tls_cert_file = /etc/postfix/ssl/mail.ccdclab.net.crt'
+#postconf -e 'smtpd_tls_loglevel = 1'
+#sudo systemctl restart postfix
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
@@ -304,6 +307,13 @@ cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 # Putting in the contents to the jail file
 sed -i '/\[dovecot\]/a enabled = true\nmaxretry = 5\nbantime = 3600' /etc/fail2ban/jail.local
 sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2ban/jail.local
+#FOR THE COMPETITION
+# Apache Stuff
+echo "Making an Apache jail..."
+sed -i '/^\[apache-auth\]/a enabled = true' /etc/fail2ban/jail.local
+
+
+
 # Restart fail2ban service
 echo "Restarting fail2ban service..."
 systemctl enable fail2ban
@@ -397,6 +407,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Secure cron
 echo "Locking down Cron"
+sudo systemctl start crond && sudo systemctl enable crond
 touch /etc/cron.allow
 chmod 600 /etc/cron.allow
 awk -F: '{print $1}' /etc/passwd | grep -v root > /etc/cron.deny
