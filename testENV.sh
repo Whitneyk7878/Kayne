@@ -1,1 +1,7 @@
-sudo wget https://github.com/activecm/rita/releases/download/v5.0.8/install-rita-zeek-here.sh
+echo "installing suricata.."
+sudo yum install suricata -y -q
+echo "Installing the latest emerging threats rules.."
+sudo wget https://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz -O /tmp/emerging.rules.tar.gz
+sudo tar -xvzf /tmp/emerging.rules.tar.gz -C /etc/suricata/
+sudo systemctl enable suricata
+sudo systemctl start suricata
