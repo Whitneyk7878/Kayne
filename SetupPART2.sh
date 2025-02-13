@@ -497,11 +497,21 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 echo "installing suricata.."
 sudo yum install suricata -y -q
+sudo yum install jq -y -q
 echo "Installing the latest emerging threats rules.."
-sudo wget https://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz -O /tmp/emerging.rules.tar.gz
-sudo tar -xvzf /tmp/emerging.rules.tar.gz -C /etc/suricata/
+# I HAVE THIS COMMENTED OUT because it breaks my poor little old fedora box to have so many rules that arent compatible
+# So i have to use the default ruleset
+# Uncomment it if you are on a better distro than me
+# sudo wget https://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz -O /tmp/emerging.rules.tar.gz
+# sudo tar -xvzf /tmp/emerging.rules.tar.gz -C /etc/suricata/
 sudo systemctl enable suricata
 sudo systemctl start suricata
+# Go into the /etc/suricata/suricata.yaml file and set af-packet (around page 13) to your ens32
+# resource: https://www.youtube.com/watch?v=UXKbh0jPPpg
+# Commands: jq '.' /var/log/suricata/eve.json | less
+# tail -f /var/log/fast.log
+# cat /var/log/suricata/stats.log
+
 
 
 #echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -525,5 +535,5 @@ sudo aide --init
 sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 echo " "
 echo -e "\e[45mSCRIPT HAS FINISHED RUNNING... REBOOTING..\e[0m"
-sleep 1
+sleep 3
 sudo reboot
