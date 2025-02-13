@@ -249,7 +249,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update system
 echo "Updating and upgrading system packages..."
-sudo yum update -y -q && yum upgrade -y -q
+#sudo yum update -y -q && yum upgrade -y -q
 
 
 
@@ -521,6 +521,12 @@ sudo systemctl start suricata
 #sudo tripwire-setup-keyfiles
 #echo "initialize the database..."
 #sudo tripwire --init
+
+
+
+
+sudo auditctl -R /etc/audit/rules.d/audit.rules
+
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
