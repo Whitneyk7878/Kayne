@@ -274,9 +274,6 @@ systemctl start postfix
 #sed -i 's|ssl_cert = </etc/pki/dovecot/certs/dovecot.pem|ssl_cert = </etc/dovecot/ssl/dovecot.crt|' /etc/dovecot/conf.d/10-ssl.conf
 #sed -i 's|ssl_key = </etc/pki/dovecot/private/dovecot.pem|ssl_key = </etc/dovecot/ssl/dovecot.pem|' /etc/dovecot/conf.d/10-ssl.conf
 #sed -i 's|#ssl_protocols = !SSLv2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|' /etc/dovecot/conf.d/10-ssl.conf
-sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
-sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
-echo 'mail_max_userip_connections = 10' > /etc/dovecot/dovecot.conf
 
 
 sudo systemctl restart dovecot
