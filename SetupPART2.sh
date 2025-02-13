@@ -125,14 +125,24 @@ sudo iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
 
+# THESE ARE PER THE COMPETITION
+sudo ip6tables -A INPUT -p tcp --dport 25 -j ACCEPT
+sudo ip6tables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+sudo ip6tables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo ip6tables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+
 sudo iptables-save | sudo tee /etc/sysconfig/iptables
+
+#SPECIFIC TO IPV6
+sudo ip6tables-save | sudo tee /etc/sysconfig/ip6tables
+
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Stuff Removal                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 #Remove Stuff I Dont like
-yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y
+yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y -q
 sudo systemctl stop xinetd && sudo systemctl disable xinetd
 sudo systemctl stop rexec && sudo systemctl disable rexec
 sudo systemctl stop rsh && sudo systemctl disable rsh
@@ -266,6 +276,8 @@ systemctl start postfix
 #sed -i 's|#ssl_protocols = !SSLv2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|' /etc/dovecot/conf.d/10-ssl.conf
 sed -i 's|#disable_plaintext_auth = yes|disable_plaintext_auth = yes|' /etc/dovecot/conf.d/10-auth.conf
 sed -i 's|#auth_verbose = no|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf
+echo 'mail_max_userip_connections = 10' > /etc/dovecot/dovecot.conf
+
 
 sudo systemctl restart dovecot
 
@@ -311,10 +323,9 @@ sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2
 # Apache Stuff
 echo "Making an Apache jail..."
 sed -i '/\[apache-auth\]/a enabled = true\nmaxretry = 5\nbantime = 3600' /etc/fail2ban/jail.local
-sed -i 's|logpath = %(apache_error_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2ban/jail.local
-
-
-
+# Roundcube Stuff
+echo "Making an Roundcube jail..."
+sed -i '/\[roundcube-auth\]/a enabled = true\nmaxretry = 5\nbantime = 3600' /etc/fail2ban/jail.local
 # Restart fail2ban service
 echo "Restarting fail2ban service..."
 systemctl enable fail2ban
@@ -359,6 +370,16 @@ sleep 1
 echo "Configuring ClamAV..."
 sudo sed -i '8s/^/#/' /etc/freshclam.conf
 sudo freshclam
+
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m                     SE LINUX                           \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+# This makes it so that se linux is enforcing policies, not just logging violations
+echo "Setting SE to enforce mode and turning off permissive.."
+sudo sed -i 's/^SELINUX=permissive/SELINUX=enforcing/' /etc/selinux/config
+
+
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -449,15 +470,19 @@ sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELIN
 for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
 sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
 
+
 #Running auditctl rules again because it doesnt like it the first time
 sudo auditctl -R /etc/audit/rules.d/audit.rules
+
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
+echo "Initializing AIDE database (this may take a while).."
 sudo aide --init
 sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-echo "SCRIPT HAS FINISHED RUNNING... REBOOTING.."
+echo " "
+echo -e "\e[45mSCRIPT HAS FINISHED RUNNING... REBOOTING..\e[0m"
 sleep 1
 sudo reboot
