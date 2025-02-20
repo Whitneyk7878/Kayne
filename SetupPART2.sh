@@ -98,8 +98,8 @@ sudo iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
 
 # HTTP/HTTPS
-sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+#sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+#sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
 
 # NTP (server time)
 sudo iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
@@ -126,15 +126,15 @@ sudo iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
 
 # THESE ARE PER THE COMPETITION
-sudo ip6tables -A INPUT -p tcp --dport 25 -j ACCEPT
-sudo ip6tables -A OUTPUT -p tcp --dport 25 -j ACCEPT
-sudo ip6tables -A INPUT -p tcp --dport 80 -j ACCEPT
-sudo ip6tables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+#sudo ip6tables -A INPUT -p tcp --dport 25 -j ACCEPT
+#sudo ip6tables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+#sudo ip6tables -A INPUT -p tcp --dport 80 -j ACCEPT
+#sudo ip6tables -A OUTPUT -p tcp --dport 80 -j ACCEPT
 
 sudo iptables-save | sudo tee /etc/sysconfig/iptables
 
 #SPECIFIC TO IPV6
-sudo ip6tables-save | sudo tee /etc/sysconfig/ip6tables
+#sudo ip6tables-save | sudo tee /etc/sysconfig/ip6tables
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -174,10 +174,10 @@ sudo systemctl stop nfslock && sudo systemctl disable nfslock
 sudo systemctl stop named && sudo systemctl disable named
 sudo systemctl stop squid && sudo systemctl disable squid
 sudo systemctl stop snmpd && sudo systemctl disable snmpd
-#sudo systemctl stop mariadb && sudo systemctl disable mariadb
-#sudo systemctl stop mysql && sudo systemctl disable mysql
+sudo systemctl stop mariadb && sudo systemctl disable mariadb
+sudo systemctl stop mysql && sudo systemctl disable mysql
 sudo systemctl stop postgresql && sudo systemctl disable postgresql
-#sudo systemctl stop httpd && sudo systemctl disable httpd
+sudo systemctl stop httpd && sudo systemctl disable httpd
 sudo systemctl stop nginx && sudo systemctl disable nginx
 sudo systemctl stop php-fpm && sudo systemctl disable php-fpm
 #THESE ARE SPECIFIC TO THE COMP ENVIRONMENT 2/12/2025
