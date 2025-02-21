@@ -1,4 +1,43 @@
+# KAYNE AUDITD
+#
+# Linux Audit Daemon - Best Practice Configuration
+# /etc/audit/audit.rules
+#
+# Compiled by Florian Roth
+#
+# Created  : 2017/12/05
+# Modified : 2023/01/25
+#
+# Based on rules published here:
+#   Gov.uk auditd rules
+#   	https://github.com/gds-operations/puppet-auditd/pull/1
+# 	CentOS 7 hardening
+# 		https://highon.coffee/blog/security-harden-centos-7/#auditd---audit-daemon
+# 	Linux audit repo
+# 		https://github.com/linux-audit/audit-userspace/tree/master/rules
+# 	Auditd high performance linux auditing
+# 		https://linux-audit.com/tuning-auditd-high-performance-linux-auditing/
+#
+# Further rules
+# 	For PCI DSS compliance see:
+# 		https://github.com/linux-audit/audit-userspace/blob/master/rules/30-pci-dss-v31.rules
+# 	For NISPOM compliance see:
+# 		https://github.com/linux-audit/audit-userspace/blob/master/rules/30-nispom.rules
 
+# Remove any existing rules
+-D
+
+# Buffer Size
+## Feel free to increase this if the machine panic's
+-b 8192
+
+# Failure Mode
+## Possible values: 0 (silent), 1 (printk, print a failure message), 2 (panic, halt the system)
+-f 1
+
+# Ignore errors
+## e.g. caused by users or files not found in the local environment
+-i
 # NOTES: when auid is set to >=1000 that means it is monitoring for all non root users.
 # If you dont have root users you need to change it to auid=0
 
