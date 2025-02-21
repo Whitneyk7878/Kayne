@@ -352,8 +352,8 @@
 -a always,exit -F arch=b32 -S connect -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_connect
 
 # Optional: inbound connections (very noisy)
--a always,exit -F arch=b64 -S bind,listen,accept,accept4 -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_bind
--a always,exit -F arch=b32 -S bind,listen,accept         -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_bind
+#-a always,exit -F arch=b64 -S bind,listen,accept,accept4 -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_bind
+#-a always,exit -F arch=b32 -S bind,listen,accept         -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_bind
 
 ########## 3 Changes to DNS / Host Config for C2 (T1568) ##########
 -w /etc/resolv.conf -p wa -k ta0011_dns_config
