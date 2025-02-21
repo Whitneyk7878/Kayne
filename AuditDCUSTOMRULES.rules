@@ -1,28 +1,48 @@
-# KAYNE AUDITD
+#oooo    oooo       .o.       oooooo   oooo ooooo      ooo oooooooooooo  .oooooo..o 
+#`888   .8P'       .888.       `888.   .8'  `888b.     `8' `888'     `8 d8P'    `Y8 
+# 888  d8'        .8"888.       `888. .8'    8 `88b.    8   888         Y88bo.      
+# 88888[         .8' `888.       `888.8'     8   `88b.  8   888oooo8     `"Y8888o.  
+# 888`88b.      .88ooo8888.       `888'      8     `88b.8   888    "         `"Y88b 
+# 888  `88b.   .8'     `888.       888       8       `888   888       o oo     .d8P 
+#o888o  o888o o88o     o8888o     o888o     o8o        `8  o888ooooood8 8""88888P'  
+                                                                                                                                                               
+#ooo        ooooo ooooo ooooooooooooo ooooooooo.   oooooooooooo                     
+#`88.       .888' `888' 8'   888   `8 `888   `Y88. `888'     `8                     
+# 888b     d'888   888       888       888   .d88'  888                             
+# 8 Y88. .P  888   888       888       888ooo88P'   888oooo8                        
+# 8  `888'   888   888       888       888`88b.     888    "                        
+# 8    Y     888   888       888       888  `88b.   888       o                     
+#o8o        o888o o888o     o888o     o888o  o888o o888ooooood8                     
+                                                                                                                                                                  
+#ooo        ooooo       .o.       ooooo      ooo ooooo       .o.         .oooooo.   
+#`88.       .888'      .888.      `888b.     `8' `888'      .888.       d8P'  `Y8b  
+# 888b     d'888      .8"888.      8 `88b.    8   888      .8"888.     888          
+# 8 Y88. .P  888     .8' `888.     8   `88b.  8   888     .8' `888.    888          
+# 8  `888'   888    .88ooo8888.    8     `88b.8   888    .88ooo8888.   888          
+# 8    Y     888   .8'     `888.   8       `888   888   .8'     `888.  `88b    ooo  
+#o8o        o888o o88o     o8888o o8o        `8  o888o o88o     o8888o  `Y8bood8P'  
+                                                                                                                                              
+#ooooooooo.   ooooo     ooo ooooo        oooooooooooo  .oooooo..o                   
+#`888   `Y88. `888'     `8' `888'        `888'     `8 d8P'    `Y8                   
+# 888   .d88'  888       8   888          888         Y88bo.                        
+# 888ooo88P'   888       8   888          888oooo8     `"Y8888o.                    
+# 888`88b.     888       8   888          888    "         `"Y88b                   
+# 888  `88b.   `88.    .8'   888       o  888       o oo     .d8P                   
+#o888o  o888o    `YbodP'    o888ooooood8 o888ooooood8 8""88888P'                    
+                                                                                   
+# Compiled by Kayne Whitney
 #
-# Linux Audit Daemon - Best Practice Configuration
+# This is built around the MITRE ATTACK framework.
+# The tactics Execution, Persistence, Privilege Escalation, Defense Evasion, and Command and Control and their techniques are all monitored with this ruleset.
+
+# PLACE INTO
 # /etc/audit/audit.rules
 #
-# Compiled by Florian Roth
 #
-# Created  : 2017/12/05
-# Modified : 2023/01/25
+# Created  : 02/20/2025
 #
 # Based on rules published here:
-#   Gov.uk auditd rules
-#   	https://github.com/gds-operations/puppet-auditd/pull/1
-# 	CentOS 7 hardening
-# 		https://highon.coffee/blog/security-harden-centos-7/#auditd---audit-daemon
-# 	Linux audit repo
-# 		https://github.com/linux-audit/audit-userspace/tree/master/rules
-# 	Auditd high performance linux auditing
-# 		https://linux-audit.com/tuning-auditd-high-performance-linux-auditing/
-#
-# Further rules
-# 	For PCI DSS compliance see:
-# 		https://github.com/linux-audit/audit-userspace/blob/master/rules/30-pci-dss-v31.rules
-# 	For NISPOM compliance see:
-# 		https://github.com/linux-audit/audit-userspace/blob/master/rules/30-nispom.rules
+#   https://attack.mitre.org/tactics/enterprise/
 
 # Remove any existing rules
 -D
