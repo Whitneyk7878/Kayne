@@ -46,47 +46,47 @@
 ## =========================
 ## T1059.x: Command & Scripting Interpreters
 ## =========================
--a always,exit -F path=/bin/sh           -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_shell
--a always,exit -F path=/bin/bash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_shell
--a always,exit -F path=/usr/bin/bash     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_shell
--a always,exit -F path=/bin/dash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_shell
--a always,exit -F path=/bin/zsh          -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_shell
+-a always,exit -F path=/bin/sh           -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
+-a always,exit -F path=/bin/bash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
+-a always,exit -F path=/usr/bin/bash     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
+-a always,exit -F path=/bin/dash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
+-a always,exit -F path=/bin/zsh          -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
 
--a always,exit -F path=/usr/bin/python   -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_python
--a always,exit -F path=/usr/bin/python3  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_python
--a always,exit -F path=/usr/bin/perl     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_perl
--a always,exit -F path=/usr/bin/ruby     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_ruby
--a always,exit -F path=/usr/bin/node     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_nodejs
+-a always,exit -F path=/usr/bin/python   -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_python
+-a always,exit -F path=/usr/bin/python3  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_python
+-a always,exit -F path=/usr/bin/perl     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_perl
+-a always,exit -F path=/usr/bin/ruby     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_ruby
+-a always,exit -F path=/usr/bin/node     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_nodejs
 
 # SQL shells
--a always,exit -F path=/usr/bin/mysql    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_sql
--a always,exit -F path=/usr/bin/psql     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1059_sql
+-a always,exit -F path=/usr/bin/mysql    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_sql
+-a always,exit -F path=/usr/bin/psql     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_sql
 
 
 ## =========================
 ## T1569.001: System Services
 ## =========================
--a always,exit -F path=/usr/sbin/service -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1569_systemservice
--a always,exit -F path=/bin/systemctl    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1569_systemservice
--a always,exit -F dir=/etc/init.d        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1569_systemservice
+-a always,exit -F path=/usr/sbin/service -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
+-a always,exit -F path=/bin/systemctl    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
+-a always,exit -F dir=/etc/init.d        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
 
 
 ## =========================
 ## T1072: Software Deployment Tools
 ## =========================
--a always,exit -F path=/usr/bin/ansible     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1072_deployment
--a always,exit -F path=/usr/bin/puppet      -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1072_deployment
--a always,exit -F path=/usr/bin/chef-client -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1072_deployment
--a always,exit -F path=/usr/bin/salt        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1072_deployment
+-a always,exit -F path=/usr/bin/ansible     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
+-a always,exit -F path=/usr/bin/puppet      -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
+-a always,exit -F path=/usr/bin/chef-client -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
+-a always,exit -F path=/usr/bin/salt        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
 
 
 ## =========================
 ## T1609: Container Administration
 ## =========================
--a always,exit -F path=/usr/bin/docker  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1609_containers
--a always,exit -F path=/usr/bin/podman  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1609_containers
--a always,exit -F path=/usr/bin/kubectl -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1609_containers
--a always,exit -F path=/usr/bin/crictl  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_t1609_containers
+-a always,exit -F path=/usr/bin/docker  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
+-a always,exit -F path=/usr/bin/podman  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
+-a always,exit -F path=/usr/bin/kubectl -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
+-a always,exit -F path=/usr/bin/crictl  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
 
 
 
@@ -178,11 +178,11 @@
 -a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat \
    -F auid>=1000 -F auid!=4294967295 \
    -F a2&0x4000 \
-   -k ta0004_t1548_suid
+   -k ta0004_suid
 -a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat \
    -F auid>=1000 -F auid!=4294967295 \
    -F a2&0x4000 \
-   -k ta0004_t1548_suid
+   -k ta0004_suid
 
 ########################
 # 2 Watch known SUID binaries for unauthorized changes
@@ -194,19 +194,19 @@
 ########################
 # 3 Sudo watchers (T1548.003)
 ########################
--w /etc/sudoers       -p wa -k ta0004_t1548_sudoers
--w /etc/sudoers.d     -p wa -k ta0004_t1548_sudoers
+-w /etc/sudoers       -p wa -k ta0004_sudoers
+-w /etc/sudoers.d     -p wa -k ta0004_sudoers
 
 -a always,exit -F path=/usr/bin/sudo -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_t1548_sudoexec
+   -k ta0004_sudoexec
 
 ########################
 # 4 Capabilities changes (setcap)
 ########################
 -a always,exit -F path=/usr/sbin/setcap -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_t1548_capabilities
+   -k ta0004_capabilities
 
 # (Optional) Watch xattr syscalls if you want all extended attribute changes
 #-a always,exit -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr \
@@ -225,13 +225,13 @@
 ########################
 -a always,exit -F path=/usr/bin/docker  -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_t1611_container
+   -k ta0004_container
 -a always,exit -F path=/usr/bin/podman  -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_t1611_container
+   -k ta0004_container
 -a always,exit -F path=/usr/bin/nsenter -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_t1611_container
+   -k ta0004_container
 
 ########################
 # 7 Kernel Modules (T1068 overlap)
@@ -247,66 +247,66 @@
 
 ########## 1 Clear/Modify System Logs (T1070.002) ##########
 -a always,exit -F dir=/var/log -F perm=wa -F auid>=1000 -F auid!=4294967295 \
-   -k ta0005_t1070_clearlogs
+   -k ta0005_clearlogs
 
 ########## 2 Clear Command History (T1070.003) ##########
 # Broad watch for writes to user .bash_history, .zsh_history, etc. (noisy)
--w /root/.bash_history -p wa -k ta0005_t1070_history
+-w /root/.bash_history -p wa -k ta0005_history
 # (Optional) for all home directories in older syntax:
-#-w /home/ -p wa -k ta0005_t1070_history
+#-w /home/ -p wa -k ta0005_history
 
 ########## 3 File Deletion & Timestomp (T1070.004 / T1070.006) ##########
 # Deletions
 -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat,rmdir \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0005_t1070_filedelete
+   -k ta0005_filedelete
 -a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat,rmdir \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0005_t1070_filedelete
+   -k ta0005_filedelete
 
 # Timestomp
 -a always,exit -F arch=b64 -S utime,utimes,futimesat,utimensat \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0005_t1070_timestomp
+   -k ta0005_timestomp
 -a always,exit -F arch=b32 -S utime,utimes,futime,futimesat,utimensat \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0005_t1070_timestomp
+   -k ta0005_timestomp
 
 ########## 4 Disable or Modify Firewall (T1562.004) ##########
--a always,exit -F path=/usr/sbin/iptables        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_t1562_firewall
--a always,exit -F path=/usr/sbin/iptables-restore -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_t1562_firewall
--a always,exit -F path=/usr/sbin/ip6tables       -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_t1562_firewall
--a always,exit -F path=/usr/sbin/nft             -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_t1562_firewall
--a always,exit -F path=/usr/bin/firewall-cmd     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_t1562_firewall
+-a always,exit -F path=/usr/sbin/iptables        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_firewall
+-a always,exit -F path=/usr/sbin/iptables-restore -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_firewall
+-a always,exit -F path=/usr/sbin/ip6tables       -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_firewall
+-a always,exit -F path=/usr/sbin/nft             -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_firewall
+-a always,exit -F path=/usr/bin/firewall-cmd     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0005_firewall
 
 -w /etc/firewalld      -p wa -k ta0005_t1562_firewall
--w /etc/sysconfig/iptables -p wa -k ta0005_t1562_firewall
+-w /etc/sysconfig/iptables -p wa -k ta0005_firewall
 # Uncomment for IPV6
-# -w /etc/sysconfig/ip6tables -p wa -k ta0005_t1562_firewall
+# -w /etc/sysconfig/ip6tables -p wa -k ta0005_firewall
 
 ########## 5 Disable or Modify Logging (T1562.007) ##########
--w /etc/rsyslog.conf     -p wa -k ta0005_t1562_logging
--w /etc/rsyslog.d        -p wa -k ta0005_t1562_logging
--w /etc/audit/auditd.conf -p wa -k ta0005_t1562_logging
--w /etc/syslog-ng/       -p wa -k ta0005_t1562_logging
--w /etc/systemd/journald.conf -p wa -k ta0005_t1562_logging
+-w /etc/rsyslog.conf     -p wa -k ta0005_logging
+-w /etc/rsyslog.d        -p wa -k ta0005_logging
+-w /etc/audit/auditd.conf -p wa -k ta0005_logging
+-w /etc/syslog-ng/       -p wa -k ta0005_logging
+-w /etc/systemd/journald.conf -p wa -k ta000_logging
 
 ########## 6 Masquerading via rename/link in system dirs (T1036) ##########
 -a always,exit -F dir=/usr/bin -F auid>=1000 -F auid!=4294967295 \
    -F syscall=rename,renameat,link,linkat,symlink,symlinkat \
-   -k ta0005_t1036_masquerading
+   -k ta0005_masquerading
 -a always,exit -F dir=/bin -F auid>=1000 -F auid!=4294967295 \
    -F syscall=rename,renameat,link,linkat,symlink,symlinkat \
-   -k ta0005_t1036_masquerading
+   -k ta0005_masquerading
 
 ########## 7 Hidden Files and Directories (T1564.001) ##########
 # Monitor file creation in /home or /tmp; watch for leading dots in the SIEM
 -a always,exit -F dir=/home -F auid>=1000 -F auid!=4294967295 \
    -S open,openat,creat \
-   -k ta0005_t1564_hidden
+   -k ta0005_hidden
 -a always,exit -F dir=/tmp -F auid>=1000 -F auid!=4294967295 \
    -S open,openat,creat \
-   -k ta0005_t1564_hidden
+   -k ta0005_hidden
 
 
 
