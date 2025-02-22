@@ -178,28 +178,28 @@
 -a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat \
    -F auid>=1000 -F auid!=4294967295 \
    -F a2&0x4000 \
-   -k ta0004_suid
+   -k ta0004_T1548_suid
 -a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat \
    -F auid>=1000 -F auid!=4294967295 \
    -F a2&0x4000 \
-   -k ta0004_suid
+   -k ta0004_T1548_suid
 
 ########################
 # 2 Watch known SUID binaries for unauthorized changes
 ########################
--w /usr/bin/passwd -p wa -k ta0004_suidbin
--w /usr/bin/sudo   -p wa -k ta0004_suidbin
+-w /usr/bin/passwd -p wa -k ta0004_T1548_suidbin
+-w /usr/bin/sudo   -p wa -k ta0004_T1548_suidbin
 # (Add or remove any typical SUID binaries in your environment)
 
 ########################
 # 3 Sudo watchers (T1548.003)
 ########################
--w /etc/sudoers       -p wa -k ta0004_sudoers
--w /etc/sudoers.d     -p wa -k ta0004_sudoers
+-w /etc/sudoers       -p wa -k ta0004_T1548_sudoers
+-w /etc/sudoers.d     -p wa -k ta0004_T1548_sudoers
 
 -a always,exit -F path=/usr/bin/sudo -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_sudoexec
+   -k ta0004_T1548_sudoexec
 
 ########################
 # 4 Capabilities changes (setcap)
@@ -225,20 +225,20 @@
 ########################
 -a always,exit -F path=/usr/bin/docker  -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_container
+   -k ta0004_T1611_container
 -a always,exit -F path=/usr/bin/podman  -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_container
+   -k ta0004_T1611_container
 -a always,exit -F path=/usr/bin/nsenter -F perm=x \
    -F auid>=1000 -F auid!=4294967295 \
-   -k ta0004_container
+   -k ta0004_T1611_container
 
 ########################
 # 7 Kernel Modules (T1068 overlap)
 ########################
--a always,exit -F path=/sbin/insmod    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_kmods
--a always,exit -F path=/sbin/rmmod     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_kmods
--a always,exit -F path=/sbin/modprobe  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_kmods
+-a always,exit -F path=/sbin/insmod    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_T1068_kmods
+-a always,exit -F path=/sbin/rmmod     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_T1068_kmods
+-a always,exit -F path=/sbin/modprobe  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0004_T1068_kmods
 
 -w /lib/modules -p wa -k ta0004_kmods
 
