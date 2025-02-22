@@ -46,47 +46,47 @@
 ## =========================
 ## T1059.x: Command & Scripting Interpreters
 ## =========================
--a always,exit -F path=/bin/sh           -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
--a always,exit -F path=/bin/bash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
--a always,exit -F path=/usr/bin/bash     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
--a always,exit -F path=/bin/dash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
--a always,exit -F path=/bin/zsh          -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_shell
+-a always,exit -F path=/bin/sh           -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_shell
+-a always,exit -F path=/bin/bash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_shell
+-a always,exit -F path=/usr/bin/bash     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_shell
+-a always,exit -F path=/bin/dash         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_shell
+-a always,exit -F path=/bin/zsh          -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_shell
 
--a always,exit -F path=/usr/bin/python   -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_python
--a always,exit -F path=/usr/bin/python3  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_python
--a always,exit -F path=/usr/bin/perl     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_perl
--a always,exit -F path=/usr/bin/ruby     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_ruby
--a always,exit -F path=/usr/bin/node     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_nodejs
+-a always,exit -F path=/usr/bin/python   -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_python
+-a always,exit -F path=/usr/bin/python3  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_python
+-a always,exit -F path=/usr/bin/perl     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_perl
+-a always,exit -F path=/usr/bin/ruby     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_ruby
+-a always,exit -F path=/usr/bin/node     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_nodejs
 
 # SQL shells
--a always,exit -F path=/usr/bin/mysql    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_sql
--a always,exit -F path=/usr/bin/psql     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_sql
+-a always,exit -F path=/usr/bin/mysql    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_sql
+-a always,exit -F path=/usr/bin/psql     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1059_sql
 
 
 ## =========================
 ## T1569.001: System Services
 ## =========================
--a always,exit -F path=/usr/sbin/service -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
--a always,exit -F path=/bin/systemctl    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
--a always,exit -F dir=/etc/init.d        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_systemservice
+-a always,exit -F path=/usr/sbin/service -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1569_systemservice
+-a always,exit -F path=/bin/systemctl    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1569_systemservice
+-a always,exit -F dir=/etc/init.d        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1569_systemservice
 
 
 ## =========================
 ## T1072: Software Deployment Tools
 ## =========================
--a always,exit -F path=/usr/bin/ansible     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
--a always,exit -F path=/usr/bin/puppet      -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
--a always,exit -F path=/usr/bin/chef-client -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
--a always,exit -F path=/usr/bin/salt        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_deployment
+-a always,exit -F path=/usr/bin/ansible     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1072_deployment
+-a always,exit -F path=/usr/bin/puppet      -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1072_deployment
+-a always,exit -F path=/usr/bin/chef-client -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1072_deployment
+-a always,exit -F path=/usr/bin/salt        -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1072_deployment
 
 
 ## =========================
 ## T1609: Container Administration
 ## =========================
--a always,exit -F path=/usr/bin/docker  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
--a always,exit -F path=/usr/bin/podman  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
--a always,exit -F path=/usr/bin/kubectl -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
--a always,exit -F path=/usr/bin/crictl  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_containers
+-a always,exit -F path=/usr/bin/docker  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1609_containers
+-a always,exit -F path=/usr/bin/podman  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1609_containers
+-a always,exit -F path=/usr/bin/kubectl -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1609_containers
+-a always,exit -F path=/usr/bin/crictl  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0002_T1609_containers
 
 
 
