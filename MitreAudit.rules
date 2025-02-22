@@ -335,15 +335,15 @@
 #-a always,exit -F arch=b32 -S bind,listen,accept         -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_bind
 
 ########## 3 Changes to DNS / Host Config for C2 (T1568) ##########
--w /etc/resolv.conf -p wa -k ta0011_dns_config
--w /etc/hosts       -p wa -k ta0011_dns_config
--w /etc/nsswitch.conf -p wa -k ta0011_dns_config
+-w /etc/resolv.conf -p wa -k ta0011_T1568_dns_config
+-w /etc/hosts       -p wa -k ta0011_T1568_dns_config
+-w /etc/nsswitch.conf -p wa -k ta0011_T1568_dns_config
 
 ########## 4 Proxy / Tunneling Tools (T1090) ##########
--a always,exit -F path=/usr/bin/proxychains -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_proxy
--a always,exit -F path=/usr/bin/tor         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_proxy
--a always,exit -F path=/usr/sbin/openvpn    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_proxy
--a always,exit -F path=/usr/bin/stunnel     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_proxy
+-a always,exit -F path=/usr/bin/proxychains -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_T1090_c2_proxy
+-a always,exit -F path=/usr/bin/tor         -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_T1090_c2_proxy
+-a always,exit -F path=/usr/sbin/openvpn    -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_T1090_c2_proxy
+-a always,exit -F path=/usr/bin/stunnel     -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_T1090_c2_proxy
 
 ########## 5 Container Exec for C2 Pivot ##########
 -a always,exit -F path=/usr/bin/docker  -F perm=x -F auid>=1000 -F auid!=4294967295 -k ta0011_c2_container
