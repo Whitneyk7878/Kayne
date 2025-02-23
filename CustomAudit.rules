@@ -428,7 +428,7 @@
 #///////////////////////////////////////////////////
 
 # Monitor TMP files
-auditctl -w /tmp -p wa -k TA0005_T1070_clear_logs
+-w /tmp -p wa -k TA0005_T1070_clear_logs
 
 # Monitor log clearing activities
 -w /var/log/wtmp -p wa -k TA0005_T1070_clear_logs
