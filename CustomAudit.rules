@@ -57,7 +57,6 @@
 
 # Monitor 'at' command execution
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/at -F key=TA0002_T1053_at
--a always,exit -F arch=b32 -S execve -F path=/usr/bin/at -F key=TA0002_T1053_at
 
 # Monitor cron job modifications
 -w /etc/cron.d/ -p wa -k TA0002_T1053_cron
@@ -96,7 +95,6 @@
 
 # Monitor all syscalls related to file creation and deletion
 # -a always,exit -F arch=b64 -S open,openat,creat,unlink,unlinkat,rename,renameat -F key=TA0002_T1072_file_ops
-# -a always,exit -F arch=b32 -S open,openat,creat,unlink,unlinkat,rename,renameat -F key=TA0002_T1072_file_ops
 
 #///////////////////////////////////////////////////
 # T1072  - Software Deployement Tools
@@ -385,7 +383,6 @@
 
 # Monitor execution of privileged commands via sudo
  -a always,exit -F arch=b64 -S execve -F path=/usr/bin/sudo -F key=TA0005_T1548_sudo
- -a always,exit -F arch=b32 -S execve -F path=/usr/bin/sudo -F key=TA0005_T1548_sudo
 
 # Monitor modifications to sudoers file
  -w /etc/sudoers -p wa -k TA0005_T1548_sudoers
@@ -393,7 +390,6 @@
 
 # Monitor execution of setuid/setgid binaries
 # -a always,exit -F arch=b64 -S execve -F key=TA0005_T1548_setuid
-# -a always,exit -F arch=b32 -S execve -F key=TA0005_T1548_setuid
 
 #///////////////////////////////////////////////////
 # T1036 - Masquerading
@@ -422,10 +418,17 @@
 -w /etc/firewalld/ -p wa -k TA0005_T1562_firewalld
 -w /etc/iptables/ -p wa -k TA0005_T1562_iptables
 -w /etc/nftables.conf -p wa -k TA0005_T1562_nftables
+-a always,exit -F arch=b64 -S execve -F path=/usr/sbin/firewalld -F key=TA0005_T1562_firewalld
+-a always,exit -F arch=b64 -S execve -F path=/usr/sbin/iptables -F key=TA0005_T1562_iptables
+-a always,exit -F arch=b64 -S execve -F path=/usr/sbin/nft -F key=TA0005_T1562_nftables
+
 
 #///////////////////////////////////////////////////
 # T1070 - Indicator Removal
 #///////////////////////////////////////////////////
+
+# Monitor TMP files
+auditctl -w /tmp -p wa -k TA0005_T1070_clear_logs
 
 # Monitor log clearing activities
 -w /var/log/wtmp -p wa -k TA0005_T1070_clear_logs
@@ -437,13 +440,11 @@
 # CAN BE NOISY
 # Monitor file deletion activity
 # -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
-# -a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
 
 
 # NEED TO INVESTIGATE THIS FURTHER
 # Monitor timestamp modifications (Timestomping)
 # -a always,exit -F arch=b64 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
-# -a always,exit -F arch=b32 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
 
 #///////////////////////////////////////////////////
 # T1027 - Obfuscated Files or Information
@@ -451,7 +452,6 @@
 
 # Monitor execution of packed binaries
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/upx -F key=TA0005_T1027_packing
--a always,exit -F arch=b32 -S execve -F path=/usr/bin/upx -F key=TA0005_T1027_packing
 
 # Monitor compiling of source code on target machine
 -w /usr/bin/gcc -p x -k TA0005_T1027_compile_after_delivery
