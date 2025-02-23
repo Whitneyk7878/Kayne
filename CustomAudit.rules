@@ -418,6 +418,32 @@
 # T1562 - Impair Defenses
 #///////////////////////////////////////////////////
 
+# Monitor usage of `chattr` (used to make files immutable)
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/chattr -F key=TA0005_T1562_immutable_control
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/chattr -F key=TA0005_T1562_immutable_control
+
+# Monitor usage of `lsattr` (used to check immutable attributes)
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/lsattr -F key=TA0005_T1562_immutable_control
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/lsattr -F key=TA0005_T1562_immutable_control
+
+# Monitor file permission modifications with `chmod`
+-a always,exit -F arch=b64 -S execve -F path=/bin/chmod -F key=TA0005_T1562_permissions
+-a always,exit -F arch=b32 -S execve -F path=/bin/chmod -F key=TA0005_T1562_permissions
+
+# Monitor file ownership changes with `chown`
+-a always,exit -F arch=b64 -S execve -F path=/bin/chown -F key=TA0005_T1562_ownership
+-a always,exit -F arch=b32 -S execve -F path=/bin/chown -F key=TA0005_T1562_ownership
+
+# Monitor file attributes changes with `setfacl` and `getfacl`
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/setfacl -F key=TA0005_T1562_acl
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/getfacl -F key=TA0005_T1562_acl
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/setfacl -F key=TA0005_T1562_acl
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/getfacl -F key=TA0005_T1562_acl
+
+# Monitor extended attributes modification with `attr`
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/attr -F key=TA0005_T1562_xattr
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/attr -F key=TA0005_T1562_xattr
+
 # Monitor disabling of Linux audit system
 -w /etc/audit/auditd.conf -p wa -k TA0005_T1562_disable_audit
 -w /etc/audit/rules.d/ -p wa -k TA0005_T1562_disable_audit
