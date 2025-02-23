@@ -16,7 +16,7 @@
 
 # Created  : 02/22/2025
 
-# The tactics Execution, Persistence, Privilege Escalation, Defense Evasion, Discovery, and Command and Control and their techniques are all monitored with this ruleset.
+# The tactics Execution, Persistence, Privilege Escalation, Defense Evasion, Discovery, Exfiltration, Impact, and Command and Control and their techniques are all monitored with this ruleset.
 
 # Based on rules published here:
 #   https://attack.mitre.org/tactics/enterprise/
