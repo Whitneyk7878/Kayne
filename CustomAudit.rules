@@ -172,8 +172,8 @@
 # Monitor execution of login scripts
 -w /etc/profile.d/ -p wa -k TA0003_T1037_BootLogonInitScripts
 -w /etc/profile -p wa -k TA0003_T1037_BootLogonInitScripts
--w ~/.bashrc -p wa -k TA0003_T1037_BootLogonInitScripts
--w ~/.bash_profile -p wa -k TA0003_T1037_BootLogonInitScripts
+# -w ~/.bashrc -p wa -k TA0003_T1037_BootLogonInitScripts
+# -w ~/.bash_profile -p wa -k TA0003_T1037_BootLogonInitScripts
 
 #///////////////////////////////////////////////////
 # T1543 - Create or Modify System Process
@@ -189,7 +189,7 @@
 
 # Monitor modifications to execution trigger points
 -w /etc/bash.bashrc -p wa -k TA0003_T1546_EventTriggeredExecution
--w ~/.bashrc -p wa -k TA0003_T1546_EventTriggeredExecution
+# -w ~/.bashrc -p wa -k TA0003_T1546_EventTriggeredExecution
 -w /etc/profile -p wa -k TA0003_T1546_EventTriggeredExecution
 -w /etc/udev/rules.d/ -p wa -k TA0003_T1546_EventTriggeredExecution
 
@@ -257,7 +257,7 @@
 #///////////////////////////////////////////////////
 
 # Monitor changes to EFI firmware variables
--w /sys/firmware/efi/efivars/ -p wa -k TA0003_T1542_PreOSBoot
+# -w /sys/firmware/efi/efivars/ -p wa -k TA0003_T1542_PreOSBoot
 
 #///////////////////////////////////////////////////
 # T1653 - Power Settings
@@ -272,7 +272,7 @@
 #///////////////////////////////////////////////////
 
 # Monitor modifications to office startup settings
--w ~/.config/libreoffice/ -p wa -k TA0003_T1137_OfficeApplicationStartup
+# -w ~/.config/libreoffice/ -p wa -k TA0003_T1137_OfficeApplicationStartup
 
 #///////////////////////////////////////////////////
 # T1505 - Server Software Component
