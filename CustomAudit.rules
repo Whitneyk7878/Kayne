@@ -495,6 +495,172 @@
 -w /etc/samba/smb.conf -p wa -k TA0005_T1207_rogue_domain_controller
 -w /var/lib/samba/ -p wa -k TA0005_T1207_rogue_domain_controller
 
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0007 DISCOVERY
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#///////////////////////////////////////////////////
+# T1087 - Account Discovery
+#///////////////////////////////////////////////////
+
+# Monitor user account enumeration
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/who -F key=TA0007_T1087_account_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/w -F key=TA0007_T1087_account_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/id -F key=TA0007_T1087_account_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/getent -F key=TA0007_T1087_account_discovery
+
+# Monitor access to /etc/passwd
+-w /etc/passwd -p r -k TA0007_T1087_account_discovery
+
+#///////////////////////////////////////////////////
+# T1010 - Application Window Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of window enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/xwininfo -F key=TA0007_T1010_window_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/wmctrl -F key=TA0007_T1010_window_discovery
+
+#///////////////////////////////////////////////////
+# T1217 - Browser Information Discovery
+#///////////////////////////////////////////////////
+
+# Monitor access to browser history and configuration files
+-w ~/.mozilla/ -p r -k TA0007_T1217_browser_discovery
+-w ~/.config/google-chrome/ -p r -k TA0007_T1217_browser_discovery
+
+#///////////////////////////////////////////////////
+# T1526 - Cloud Service Discovery
+#///////////////////////////////////////////////////
+
+# Monitor access to cloud metadata services
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/curl -F key=TA0007_T1526_cloud_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/wget -F key=TA0007_T1526_cloud_discovery
+
+#///////////////////////////////////////////////////
+# T1518 - Software Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of system enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ps -F key=TA0007_T1518_software_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/dpkg -F key=TA0007_T1518_software_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/rpm -F key=TA0007_T1518_software_discovery
+
+#///////////////////////////////////////////////////
+# T1082 - System Information Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of system information commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/uname -F key=TA0007_T1082_system_info
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/lsb_release -F key=TA0007_T1082_system_info
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/hostname -F key=TA0007_T1082_system_info
+
+#///////////////////////////////////////////////////
+# T1614 - System Location Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of locale and timezone commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/locale -F key=TA0007_T1614_location_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/timedatectl -F key=TA0007_T1614_location_discovery
+
+#///////////////////////////////////////////////////
+# T1016 - System Network Configuration Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of network configuration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ifconfig -F key=TA0007_T1016_network_config
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ip -F key=TA0007_T1016_network_config
+
+#///////////////////////////////////////////////////
+# T1049 - System Network Connections Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of network connection enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/netstat -F key=TA0007_T1049_network_connections
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ss -F key=TA0007_T1049_network_connections
+
+#///////////////////////////////////////////////////
+# T1135 - Network Share Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of network share enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/mount -F key=TA0007_T1135_network_shares
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/df -F key=TA0007_T1135_network_shares
+
+#///////////////////////////////////////////////////
+# T1069 - Permission Groups Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of user group enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/groups -F key=TA0007_T1069_groups
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/id -F key=TA0007_T1069_groups
+
+#///////////////////////////////////////////////////
+# T1201 - Password Policy Discovery
+#///////////////////////////////////////////////////
+
+# Monitor access to login policy files
+-w /etc/login.defs -p r -k TA0007_T1201_password_policy
+-w /etc/security/pwquality.conf -p r -k TA0007_T1201_password_policy
+
+#///////////////////////////////////////////////////
+# T1057 - Process Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of process enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ps -F key=TA0007_T1057_process_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/top -F key=TA0007_T1057_process_discovery
+
+#///////////////////////////////////////////////////
+# T1083 - File and Directory Discovery
+#///////////////////////////////////////////////////
+
+# Monitor execution of file and directory enumeration commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ls -F key=TA0007_T1083_file_discovery
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/find -F key=TA0007_T1083_file_discovery
+
+#///////////////////////////////////////////////////
+# T1552 - Unsecured Credentials
+#///////////////////////////////////////////////////
+
+# Monitor access to common credential storage locations
+-w /home/ -p r -k TA0007_T1552_unsecured_creds
+-w /etc/passwd -p r -k TA0007_T1552_unsecured_creds
+-w /etc/shadow -p r -k TA0007_T1552_unsecured_creds
+
+#///////////////////////////////////////////////////
+# T1590 - Gather Victim Network Information
+#///////////////////////////////////////////////////
+
+# Monitor execution of network scanning commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/nmap -F key=TA0007_T1590_network_info
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/traceroute -F key=TA0007_T1590_network_info
+
+#///////////////////////////////////////////////////
+# T1595 - Active Scanning
+#///////////////////////////////////////////////////
+
+# Monitor execution of vulnerability scanning tools
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/nikto -F key=TA0007_T1595_vuln_scanning
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/lynis -F key=TA0007_T1595_vuln_scanning
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #//////////////////////////////////////////////////////////////////////////////////////////////////////
 # TA0011 COMMAND AND CONTROL
 #//////////////////////////////////////////////////////////////////////////////////////////////////////
