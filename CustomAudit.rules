@@ -419,6 +419,7 @@
 # Monitor clearing of bash history
 # -w ~/.bash_history -p wa -k TA0005_T1562_bash_history
 
+# THESE DONT WORK FIX THEM
 # Monitor firewall modifications
 -w /etc/firewalld/ -p wa -k TA0005_T1562_firewalld
 -w /etc/iptables/ -p wa -k TA0005_T1562_iptables
@@ -437,8 +438,8 @@
 
 # CAN BE NOISY
 # Monitor file deletion activity
--a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
--a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
+# -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
+# -a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
 
 
 # NEED TO INVESTIGATE THIS FURTHER
@@ -466,6 +467,7 @@
 # Monitor indirect execution methods
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/eval -F key=TA0005_T1202_indirect_execution
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/exec -F key=TA0005_T1202_indirect_execution
+-a always,exit -F arch=b64 -S execve -F exe=/usr/bin/alias -F key=TA0005_T1202_indirect_execution
 
 #///////////////////////////////////////////////////
 # T1553 - Subvert Trust Controls
