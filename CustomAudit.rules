@@ -440,9 +440,11 @@
 -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
 -a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
 
+
+# NEED TO INVESTIGATE THIS FURTHER
 # Monitor timestamp modifications (Timestomping)
--a always,exit -F arch=b64 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
--a always,exit -F arch=b32 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
+# -a always,exit -F arch=b64 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
+# -a always,exit -F arch=b32 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
 
 #///////////////////////////////////////////////////
 # T1027 - Obfuscated Files or Information
@@ -478,8 +480,10 @@
 #///////////////////////////////////////////////////
 
 # Monitor direct access to block devices
--w /dev/sd* -p wa -k TA0005_T1006_volume_access
--w /dev/nvme* -p wa -k TA0005_T1006_volume_access
+-w /dev/sda -p wa -k TA0005_T1006_volume_access
+-w /dev/sda1 -p wa -k TA0005_T1006_volume_access
+-w /dev/sda2 -p wa -k TA0005_T1006_volume_access
+-w /dev/nvram -p wa -k TA0005_T1006_volume_access
 
 #///////////////////////////////////////////////////
 # T1207 - Rogue Domain Controller
