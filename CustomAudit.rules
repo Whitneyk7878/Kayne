@@ -221,6 +221,7 @@
 # Monitor execution flow hijacking attempts
 -w /etc/ld.so.preload -p wa -k TA0003_T1574_HijackExecutionFlow
 -w /etc/environment -p wa -k TA0003_T1574_HijackExecutionFlow
+-w /etc/ld.so.conf -p wa -k TA0003_T1574_HijackExecutionFlow
 
 #///////////////////////////////////////////////////
 # T1525 - Implant Internal Image
