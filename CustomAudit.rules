@@ -495,6 +495,151 @@
 -w /etc/samba/smb.conf -p wa -k TA0005_T1207_rogue_domain_controller
 -w /var/lib/samba/ -p wa -k TA0005_T1207_rogue_domain_controller
 
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0011 COMMAND AND CONTROL
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#///////////////////////////////////////////////////
+# T1071 - Application Layer Protocol
+#///////////////////////////////////////////////////
+
+# Monitor execution of web-based protocols
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/curl -F key=TA0011_T1071_web_protocols
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/wget -F key=TA0011_T1071_web_protocols
+
+# Monitor usage of FTP, SCP, and SFTP for possible C2 communication
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ftp -F key=TA0011_T1071_ftp
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/scp -F key=TA0011_T1071_ftp
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/sftp -F key=TA0011_T1071_ftp
+
+# Monitor DNS tunneling attempts
+-w /etc/resolv.conf -p wa -k TA0011_T1071_dns
+
+#///////////////////////////////////////////////////
+# T1092 - Communication Through Removable Media
+#///////////////////////////////////////////////////
+
+# Monitor mounting of USB or external storage devices
+-w /media/ -p wa -k TA0011_T1092_usb_mount
+-w /mnt/ -p wa -k TA0011_T1092_usb_mount
+
+#///////////////////////////////////////////////////
+# T1132 - Data Encoding
+#///////////////////////////////////////////////////
+
+# Monitor base64 encoding to detect possible data obfuscation
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/base64 -F key=TA0011_T1132_encoding
+
+# Monitor custom encoding tools (xxd, hexdump)
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/xxd -F key=TA0011_T1132_encoding
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/hexdump -F key=TA0011_T1132_encoding
+
+#///////////////////////////////////////////////////
+# T1001 - Data Obfuscation
+#///////////////////////////////////////////////////
+
+# Monitor use of steganography tools
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/stegsolve -F key=TA0011_T1001_steganography
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/outguess -F key=TA0011_T1001_steganography
+
+# Monitor protocol impersonation attempts
+-w /etc/services -p wa -k TA0011_T1001_protocol_impersonation
+
+#///////////////////////////////////////////////////
+# T1568 - Dynamic Resolution
+#///////////////////////////////////////////////////
+
+# Monitor suspicious modifications to DNS configuration
+-w /etc/hosts -p wa -k TA0011_T1568_dns_manipulation
+-w /etc/nsswitch.conf -p wa -k TA0011_T1568_dns_manipulation
+
+#///////////////////////////////////////////////////
+# T1573 - Encrypted Channel
+#///////////////////////////////////////////////////
+
+# Monitor creation of encrypted connections
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/openssl -F key=TA0011_T1573_encryption
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/gnutls-cli -F key=TA0011_T1573_encryption
+
+#///////////////////////////////////////////////////
+# T1008 - Fallback Channels
+#///////////////////////////////////////////////////
+
+# Monitor establishment of backup network connections
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/tor -F key=TA0011_T1008_fallback_channels
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/i2p -F key=TA0011_T1008_fallback_channels
+
+#///////////////////////////////////////////////////
+# T1105 - Ingress Tool Transfer
+#///////////////////////////////////////////////////
+
+# Monitor downloading of potential malicious tools
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/curl -F key=TA0011_T1105_ingress_transfer
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/wget -F key=TA0011_T1105_ingress_transfer
+
+#///////////////////////////////////////////////////
+# T1095 - Non-Application Layer Protocol
+#///////////////////////////////////////////////////
+
+# Monitor use of raw sockets and custom network protocols
+-a always,exit -F arch=b64 -S socket -F key=TA0011_T1095_non_app_layer
+-a always,exit -F arch=b64 -S setsockopt -F key=TA0011_T1095_non_app_layer
+
+#///////////////////////////////////////////////////
+# T1571 - Non-Standard Port
+#///////////////////////////////////////////////////
+
+# NEED TO DO MORE ABOUT THIS
+# Monitor network traffic on non-standard ports
+#-w /etc/ssh/sshd_config -p wa -k TA0011_T1571_non_standard_ports
+
+#///////////////////////////////////////////////////
+# T1572 - Protocol Tunneling
+#///////////////////////////////////////////////////
+
+# Monitor SSH tunneling attempts
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/ssh -F key=TA0011_T1572_tunneling
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/autossh -F key=TA0011_T1572_tunneling
+
+#///////////////////////////////////////////////////
+# T1090 - Proxy
+#///////////////////////////////////////////////////
+
+# Monitor use of proxy tools
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/proxychains -F key=TA0011_T1090_proxy
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/socat -F key=TA0011_T1090_proxy
+
+# Monitor external proxy configurations
+-w /etc/proxychains.conf -p wa -k TA0011_T1090_proxy_config
+
+#///////////////////////////////////////////////////
+# T1219 - Remote Access Software
+#///////////////////////////////////////////////////
+
+# Monitor execution of remote access tools
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/teamviewer -F key=TA0011_T1219_remote_access
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/anydesk -F key=TA0011_T1219_remote_access
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/xrdp -F key=TA0011_T1219_remote_access
+
+#///////////////////////////////////////////////////
+# T1205 - Traffic Signaling
+#///////////////////////////////////////////////////
+
+# Monitor port knocking attempts
+-w /etc/knockd.conf -p wa -k TA0011_T1205_port_knocking
+
+#///////////////////////////////////////////////////
+# T1102 - Web Service
+#///////////////////////////////////////////////////
+
+# Monitor outbound communication with cloud storage and web-based C2
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/dropbox -F key=TA0011_T1102_web_service
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/mega-cmd -F key=TA0011_T1102_web_service
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/onedrive -F key=TA0011_T1102_web_service
+
+
+
+
 
 
 
