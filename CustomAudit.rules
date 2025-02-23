@@ -581,9 +581,10 @@
 # T1095 - Non-Application Layer Protocol
 #///////////////////////////////////////////////////
 
+# FIX THESE
 # Monitor use of raw sockets and custom network protocols
--a always,exit -F arch=b64 -S socket -F key=TA0011_T1095_non_app_layer
--a always,exit -F arch=b64 -S setsockopt -F key=TA0011_T1095_non_app_layer
+# -a always,exit -F arch=b64 -S socket -F key=TA0011_T1095_non_app_layer
+# -a always,exit -F arch=b64 -S setsockopt -F key=TA0011_T1095_non_app_layer
 
 #///////////////////////////////////////////////////
 # T1571 - Non-Standard Port
