@@ -51,6 +51,23 @@
 -a always,exit -F arch=b64 -S execve -F path=/bin/sh -F key=TA0002_T1059_shell
 -a always,exit -F arch=b64 -S execve -F path=/bin/bash -F key=TA0002_T1059_shell
 -a always,exit -F arch=b64 -S execve -F path=/bin/zsh -F key=TA0002_T1059_shell
+-w /bin/ash -p x -k TA0002_T1059_shell
+-w /bin/csh -p x -k TA0002_T1059_shell
+-w /bin/fish -p x -k TA0002_T1059_shell
+-w /bin/tcsh -p x -k TA0002_T1059_shell
+-w /bin/tclsh -p x -k TA0002_T1059_shell
+-w /bin/xonsh -p x -k TA0002_T1059_shell
+-w /usr/local/bin/xonsh -p x -k TA0002_T1059_shell
+-w /bin/open -p x -k TA0002_T1059_shell
+-w /bin/rbash -p x -k TA0002_T1059_shell
+
+# https://gtfobins.github.io/gtfobins/wish/
+-w /bin/wish -p x -k TA0002_T1059_shell
+-w /usr/bin/wish -p x -k TA0002_T1059_shell
+
+# https://gtfobins.github.io/gtfobins/yash/
+-w /bin/yash -p x -k TA0002_T1059_shell
+-w /usr/bin/yash -p x -k TA0002_T1059_shell
 
 # Monitor scripting languages
 # WILL ONLY TRACK INSTALLATION OR MODIFICATION OF THE BINARY
@@ -63,6 +80,45 @@
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/perl -F key=TA0002_T1059_perl
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/node -F key=TA0002_T1059_nodejs
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/fish -F key=TA0002_T1059_fish
+# PIP(3) (Python installs)
+-w /usr/bin/pip -p x -k TA0002_T1059_python3
+-w /usr/local/bin/pip -p x -k TA0002_T1059_python3
+-w /usr/bin/pip3 -p x -k TA0002_T1059_python3
+-w /usr/local/bin/pip3 -p x -k TA0002_T1059_python3
+-w /usr/bin/pipx -p x -k TA0002_T1059_python3
+-w /usr/local/bin/pipx -p x -k TA0002_T1059_python3
+
+# npm
+## T1072 third party software
+## https://www.npmjs.com
+## https://docs.npmjs.com/cli/v6/commands/npm-audit
+-w /usr/bin/npm -p x -k TA0002_T1059_npm
+
+# Comprehensive Perl Archive Network (CPAN) (CPAN installs)
+## T1072 third party software
+## https://www.cpan.org
+-w /usr/bin/cpan -p x -k TA0002_T1059_cpan
+
+# Ruby (RubyGems installs)
+## T1072 third party software
+## https://rubygems.org
+-w /usr/bin/gem -p x -k TA0002_T1059_ruby
+
+# LuaRocks (Lua installs)
+## T1072 third party software
+## https://luarocks.org
+-w /usr/bin/luarocks -p x -k TA0002_T1059_lua
+
+# Pacman (Arch Linux)
+## https://wiki.archlinux.org/title/Pacman
+## T1072 third party software
+-w /etc/pacman.conf -p x -k TA0002_T1059_pacman
+-w /etc/pacman.d -p x -k TA0002_T1059_pacman
+
+# Package installer
+# RPM (Redhat/CentOS)
+-w /usr/bin/rpm -p x -k software_mgmt
+-w /usr/bin/yum -p x -k software_mgmt
 
 #///////////////////////////////////////////////////
 # T1053 - Scheduled Task/Job Executionn
@@ -108,6 +164,41 @@
 
 # Monitor all syscalls related to file creation and deletion
 # -a always,exit -F arch=b64 -S open,openat,creat,unlink,unlinkat,rename,renameat -F key=TA0002_T1072_file_ops
+
+#///////////////////////////////////////////////////
+# T1559  - Inter-Process Communication
+#///////////////////////////////////////////////////
+
+## msgctl
+#-a always,exit -S ipc -F a0=14 -k T1559_Inter-Process_Communication
+## msgget
+#-a always,exit -S ipc -F a0=13 -k T1559_Inter-Process_Communication
+## Use these lines on x86_64, ia64 instead
+-a always,exit -F arch=b64 -S msgctl -k T1559_Inter-Process_Communication
+-a always,exit -F arch=b64 -S msgget -k T1559_Inter-Process_Communication
+
+## semctl
+#-a always,exit -S ipc -F a0=3 -k TA0002_T1559_Inter-Process
+## semget
+#-a always,exit -S ipc -F a0=2 -k TA0002_T1559_Inter-Process
+## semop
+#-a always,exit -S ipc -F a0=1 -k TA0002_T1559_Inter-Process
+## semtimedop
+#-a always,exit -S ipc -F a0=4 -k TA0002_T1559_Inter-Process
+## Use these lines on x86_64, ia64 instead
+-a always,exit -F arch=b64 -S semctl -k TA0002_T1559_Inter-Process
+-a always,exit -F arch=b64 -S semget -k TA0002_T1559_Inter-Process
+-a always,exit -F arch=b64 -S semop -k TA0002_T1559_Inter-Process
+-a always,exit -F arch=b64 -S semtimedop -k TA0002_T1559_Inter-Process
+
+## shmctl
+#-a always,exit -S ipc -F a0=24 -k TA0002_T1559_Inter-Process
+## shmget
+#-a always,exit -S ipc -F a0=23 -k TA0002_T1559_Inter-Process
+## Use these lines on x86_64, ia64 instead
+-a always,exit -F arch=b64 -S shmctl -k TA0002_T1559_Inter-Process
+-a always,exit -F arch=b64 -S shmget -k TA0002_T1559_Inter-Process
+
 
 #///////////////////////////////////////////////////
 # T1072  - Software Deployement Tools
@@ -301,6 +392,21 @@
 -w /etc/docker/ -p wa -k TA0003_T1543_ContainerService
 
 
+#///////////////////////////////////////////////////
+# T1556 - Modify Authentication Process
+#///////////////////////////////////////////////////
+
+-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=-1 -k TA0003_T1556_file_access
+-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=-1 -k TA0003_T1556_file_access
+# Unsuccessful Creation
+-a always,exit -F arch=b64 -S mkdir,creat,link,symlink,mknod,mknodat,linkat,symlinkat -F exit=-EACCES -k TA0003_T1556_file_creation
+-a always,exit -F arch=b64 -S mkdir,link,symlink,mkdirat -F exit=-EPERM -k TA0003_T1556_file_creation
+
+### Unsuccessful Modification
+-a always,exit -F arch=b64 -S rename -S renameat -S truncate -S chmod -S setxattr -S lsetxattr -S removexattr -S lremovexattr -F exit=-EACCES -k TA0003_T1556_file_modification
+-a always,exit -F arch=b64 -S rename -S renameat -S truncate -S chmod -S setxattr -S lsetxattr -S removexattr -S lremovexattr -F exit=-EPERM -k TA0003_T1556_file_modification
+
+
 #//////////////////////////////////////////////////////////////////////////////////////////////////////
 # TA0004 PRIVILEGE ESCALATION
 #//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -332,9 +438,32 @@
 -w /proc/self/maps -p wa -k TA0004_T1055_vdso
 -w /proc/self/mem -p wa -k TA0004_T1055_vdso
 
+# General code injection
+-a always,exit -F arch=b64 -S ptrace -F a0=0x4 -k TA0004_T1055_injection
+-a always,exit -F arch=b64 -S ptrace -F a0=0x5 -k TA0004_T1055_injection
+-a always,exit -F arch=b64 -S ptrace -F a0=0x6 -k TA0004_T1055_injection
+-a always,exit -F arch=b64 -S ptrace -k TA0004_T1055_injection
+
 #///////////////////////////////////////////////////
 # T1078 - Valid Accounts
 #///////////////////////////////////////////////////
+
+# dbus-send invocation
+# may indicate privilege escalation CVE-2021-3560
+-w /usr/bin/dbus-send -p x -k TA0004_T1078_dbus_send
+-w /usr/bin/gdbus -p x -k TA0004_T1078_gdubs_call
+
+# setfiles
+-a always,exit -F path=/usr/bin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
+-a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
+
+# dbus
+-a always,exit -F path=/lib64/dbus-1/dbus-daemon-launch-helper -F perm=x -F auid>=500 -F auid!=4294967295 -k TA0004_T1078_Valid_Accounts
+-a always,exit -F path=/usr/lib64/dbus-1/dbus-daemon-launch-helper -F perm=x -F auid>=500 -F auid!=4294967295 -k TA0004_T1078_Valid_Accounts
+
+# pkexec invocation
+# may indicate privilege escalation CVE-2021-4034
+-w /usr/bin/pkexec -p x -k TA0004_T1078_pkexec
 
 # Monitor creation or modification of local user accounts
 -w /etc/passwd -p wa -k TA0004_T1078_local_accounts
@@ -779,6 +908,8 @@
 # Monitor use of raw sockets and custom network protocols
 # -a always,exit -F arch=b64 -S socket -F key=TA0011_T1095_non_app_layer
 # -a always,exit -F arch=b64 -S setsockopt -F key=TA0011_T1095_non_app_layer
+-a always,exit -F arch=b64 -S socket -F a0=2  -k TA0011_T1095_network_socket
+-a always,exit -F arch=b64 -S socket -F a0=10 -k TA0011_T1095_network_socket
 
 #///////////////////////////////////////////////////
 # T1571 - Non-Standard Port
@@ -831,6 +962,118 @@
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/dropbox -F key=TA0011_T1102_web_service
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/mega-cmd -F key=TA0011_T1102_web_service
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/onedrive -F key=TA0011_T1102_web_service
+
+#///////////////////////////////////////////////////
+# Typically Abused Tools for C2
+#///////////////////////////////////////////////////
+
+-w /bin/nc -p x -k TA0011_C2
+-w /bin/netcat -p x -k TA0011_C2
+-w /usr/bin/ncat -p x -k TA0011_C2
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0010 EXFILTRATION
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# Data compression
+-w /usr/bin/zip -p x -k TA0010_Data_Compressed
+-w /usr/bin/gzip -p x -k TA0010_Data_Compressed
+-w /usr/bin/tar -p x -k TA0010_Data_Compressed
+-w /usr/bin/bzip2 -p x -k TA0010_Data_Compressed
+-w /usr/bin/lzip -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/lzip -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/lz4 -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/lz4 -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/lzop -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/lzop -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/plzip -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/plzip -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/pbzip2 -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/pbzip2 -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/lbzip2 -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/lbzip2 -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/pixz -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/pixz -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/pigz -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/pigz -p x -k TA0010_Data_Compressed
+-w /usr/bin/unpigz -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/unpigz -p x -k TA0010_Data_Compressed
+
+-w /usr/bin/zstd -p x -k TA0010_Data_Compressed
+-w /usr/local/bin/zstd -p x -k TA0010_Data_Compressed
+
+# gzexe
+-a always,exit -F arch=b32 -F path=/usr/bin/gzexe -F perm=x -F key=TA0010_Data_Compressed
+-a always,exit -F arch=b64 -F path=/usr/bin/gzexe -F perm=x -F key=TA0010_Data_Compressed
+
+-a always,exit -F arch=b32 -F path=/usr/sbin/gzexe -F perm=x -F key=TA0010_Data_Compressed
+-a always,exit -F arch=b64 -F path=/usr/sbin/gzexe -F perm=x -F key=TA0010_Data_Compressed
+
+# Anonymous file creation
+-a always,exit -F arch=b64 -S memfd_create -F key=TA0010_Anonymous_File_Creation
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0040 IMPACT
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#///////////////////////////////////////////////////
+# T1529 - Power Off / Reboot / Shutdown
+#///////////////////////////////////////////////////
+
+# Power state
+-w /sbin/shutdown -p x -k TA0040_T1529_power
+-w /sbin/poweroff -p x -k TA0040_T1529_power
+-w /sbin/reboot -p x -k TA0040_T1529_power
+-w /sbin/halt -p x -k TA0040_T1529_power
+
+#///////////////////////////////////////////////////
+# T1489 - Service Stop
+#///////////////////////////////////////////////////
+
+# Monitor direct systemctl stop commands
+-a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=stop -k TA0040_T1489_service_stop
+-a always,exit -F arch=b32 -S execve -F path=/bin/systemctl -F a0=stop -k TA0040_T1489_service_stop
+
+# Monitor direct service stop commands
+-a always,exit -F arch=b64 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
+-a always,exit -F arch=b32 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
+
+# Monitor stopping services using init scripts
+-a always,exit -F arch=b64 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
+-a always,exit -F arch=b32 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
+
+# Monitor attempts to kill essential system services
+-a always,exit -F arch=b64 -S kill -F a1=9 -k TA0040_T1489_service_stop
+-a always,exit -F arch=b32 -S kill -F a1=9 -k TA0040_T1489_service_stop
+
+# Monitor disabling of services via systemctl
+-a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=disable -k TA0040_T1489_service_disable
+-a always,exit -F arch=b32 -S execve -F path=/bin/systemctl -F a0=disable -k TA0040_T1489_service_disable
+
+# Monitor removal of service unit files
+-w /etc/systemd/system/ -p wa -k TA0040_T1489_service_disable
+-w /usr/lib/systemd/system/ -p wa -k TA0040_T1489_service_disable
+
+# Monitor changes to services within NetworkManager (network disruptions)
+-w /etc/NetworkManager/system-connections/ -p wa -k TA0040_T1489_service_config
+
+# Monitor removal of critical services
+-w /etc/systemd/system/ -p wa -k TA0040_T1489_service_removal
+-w /usr/lib/systemd/system/ -p wa -k TA0040_T1489_service_removal
+
+# Monitor shutdown and reboot attempts (Red Teams may try this to cover tracks)
+-a always,exit -F arch=b64 -S reboot -k TA0040_T1489_service_shutdown
+-a always,exit -F arch=b32 -S reboot -k TA0040_T1489_service_shutdown
+-a always,exit -F arch=b64 -S shutdown -k TA0040_T1489_service_shutdown
+-a always,exit -F arch=b32 -S shutdown -k TA0040_T1489_service_shutdown
 
 
 
