@@ -467,7 +467,7 @@
 # Monitor indirect execution methods
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/eval -F key=TA0005_T1202_indirect_execution
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/exec -F key=TA0005_T1202_indirect_execution
--a always,exit -F arch=b64 -S execve -F exe=/usr/bin/alias -F key=TA0005_T1202_indirect_execution
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/alias -F key=TA0005_T1202_indirect_execution
 
 #///////////////////////////////////////////////////
 # T1553 - Subvert Trust Controls
