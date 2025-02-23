@@ -1053,13 +1053,13 @@
 # -a always,exit -F arch=b64 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
 
 # Monitor stopping services using init scripts
--a always,exit -F arch=b64 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
+# -a always,exit -F arch=b64 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
 
 # Monitor attempts to kill essential system services
 -a always,exit -F arch=b64 -S kill -F a1=9 -k TA0040_T1489_service_stop
 
 # Monitor disabling of services via systemctl
--a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=disable -k TA0040_T1489_service_disable
+-a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -k TA0040_T1489_service_disable
 
 # Monitor removal of service unit files
 -w /etc/systemd/system/ -p wa -k TA0040_T1489_service_disable
@@ -1075,8 +1075,8 @@
 # Monitor shutdown and reboot attempts (Red Teams may try this to cover tracks)
 -a always,exit -F arch=b64 -S reboot -k TA0040_T1489_service_shutdown
 -a always,exit -F arch=b32 -S reboot -k TA0040_T1489_service_shutdown
--a always,exit -F arch=b64 -S shutdown -k TA0040_T1489_service_shutdown
--a always,exit -F arch=b32 -S shutdown -k TA0040_T1489_service_shutdown
+# -a always,exit -F arch=b64 -S shutdown -k TA0040_T1489_service_shutdown
+# -a always,exit -F arch=b32 -S shutdown -k TA0040_T1489_service_shutdown
 
 
 
