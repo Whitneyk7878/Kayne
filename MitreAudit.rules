@@ -136,9 +136,9 @@
 
 
 #################### T1098.004 / T1556.004 SSH Authorized Keys #################
--w /root/.ssh/authorized_keys  -p wa -k ta0003_ssh_keys
+#-w /root/.ssh/authorized_keys  -p wa -k ta0003_ssh_keys
 # (Optional) All user .ssh directories:
--w /home/ -p wa -k ta0003_ssh_keys
+#-w /home/ -p wa -k ta0003_ssh_keys
 
 
 ############### T1543.002 Systemd Service ###############
