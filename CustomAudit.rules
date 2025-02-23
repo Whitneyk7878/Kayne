@@ -601,6 +601,8 @@
 
 # File Deletion
 -a always,exit -F arch=b64 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid!=-1 -k TA0005_T1070_delete
+-w /bin/rm -p x -k monitor_rm
+-a always,exit -F arch=b64 -S execve -F path=/bin/rm -F key=monitor_rm_exec
 
 # Monitor TMP files
 -w /tmp -p wa -k TA0005_T1070_clear_logs
@@ -1084,7 +1086,6 @@
 -a always,exit -F arch=b32 -S reboot -k TA0040_T1489_service_shutdown
 # -a always,exit -F arch=b64 -S shutdown -k TA0040_T1489_service_shutdown
 # -a always,exit -F arch=b32 -S shutdown -k TA0040_T1489_service_shutdown
-
 
 
 
