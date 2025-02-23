@@ -91,18 +91,12 @@
 # T1204  - User Execution
 #///////////////////////////////////////////////////
 
-# Monitor access/modification of compressed archives system-wide
--w / -p rwxa -k TA0002_T1204_badfiles
+# Monitor all file creations and deletions system-wide
+-w / -p wa -k TA0002_T1204_file_ops
 
-# Specific archive extensions
--w /*.zip -p rwxa -k TA0002_T1204_badfiles
--w /*.tar -p rwxa -k TA0002_T1204_badfiles
--w /*.tgz -p rwxa -k TA0002_T1204_badfiles
--w /*.tar.gz -p rwxa -k TA0002_T1204_badfiles
--w /*.tar.bz2 -p rwxa -k TA0002_T1204_badfiles
--w /*.tbz2 -p rwxa -k TA0002_T1204_badfiles
--w /*.rar -p rwxa -k TA0002_T1204_badfiles
--w /*.7z -p rwxa -k TA0002_T1204_badfiles
+# Monitor all syscalls related to file creation and deletion
+-a always,exit -F arch=b64 -S open,openat,creat,unlink,unlinkat,rename,renameat -F key=TA0002_T1204_file_ops
+-a always,exit -F arch=b32 -S open,openat,creat,unlink,unlinkat,rename,renameat -F key=TA0002_T1204_file_ops
 
 #///////////////////////////////////////////////////
 # T1072  - Software Deployement Tools
