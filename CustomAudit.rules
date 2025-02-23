@@ -526,7 +526,7 @@
 
 # Monitor access to browser history and configuration files
 -w /.mozilla/ -p r -k TA0007_T1217_browser_discovery
--w /.config/google-chrome/ -p r -k TA0007_T1217_browser_discovery
+-w /.config/ -p r -k TA0007_T1217_browser_discovery
 
 #///////////////////////////////////////////////////
 # T1526 - Cloud Service Discovery
