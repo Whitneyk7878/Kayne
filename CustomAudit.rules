@@ -292,6 +292,95 @@
 -w /etc/docker/ -p wa -k TA0003_T1543_ContainerService
 
 
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0004 Privilege Escalation
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#///////////////////////////////////////////////////
+# T1548 - Abuse Elevation Control Mechanism
+#///////////////////////////////////////////////////
+
+# Monitor execution of privileged commands via sudo
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/sudo -F key=TA0004_T1548_sudo
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/sudo -F key=TA0004_T1548_sudo
+
+# Monitor modifications to sudoers file
+-w /etc/sudoers -p wa -k TA0004_T1548_sudoers
+-w /etc/sudoers.d/ -p wa -k TA0004_T1548_sudoers
+
+# Monitor setuid and setgid file executions
+-a always,exit -F arch=b64 -S execve -F key=TA0004_T1548_setuid
+-a always,exit -F arch=b32 -S execve -F key=TA0004_T1548_setuid
+-w /usr/bin/su -p wa -k TA0004_T1548_su
+
+#///////////////////////////////////////////////////
+# T1055 - Process Injection
+#///////////////////////////////////////////////////
+
+# Monitor ptrace usage for process manipulation
+-a always,exit -F arch=b64 -S ptrace -F key=TA0004_T1055_ptrace
+-a always,exit -F arch=b32 -S ptrace -F key=TA0004_T1055_ptrace
+
+# Monitor VDSO hijacking attempts
+-w /proc/self/maps -p wa -k TA0004_T1055_vdso
+-w /proc/self/mem -p wa -k TA0004_T1055_vdso
+
+#///////////////////////////////////////////////////
+# T1078 - Valid Accounts
+#///////////////////////////////////////////////////
+
+# Monitor creation or modification of local user accounts
+-w /etc/passwd -p wa -k TA0004_T1078_local_accounts
+-w /etc/shadow -p wa -k TA0004_T1078_local_accounts
+-w /etc/group -p wa -k TA0004_T1078_local_accounts
+
+#///////////////////////////////////////////////////
+# T1037 - Boot or Logon Initialization Scripts
+#///////////////////////////////////////////////////
+
+# Monitor modifications to RC startup scripts
+-w /etc/rc.local -p wa -k TA0004_T1037_rc_scripts
+-w /etc/rc.d/ -p wa -k TA0004_T1037_rc_scripts
+
+#///////////////////////////////////////////////////
+# T1543 - Create or Modify System Process
+#///////////////////////////////////////////////////
+
+# Monitor systemd service modifications
+-w /etc/systemd/system/ -p wa -k TA0004_T1543_systemd
+-w /usr/lib/systemd/system/ -p wa -k TA0004_T1543_systemd
+
+# Monitor container service modifications
+-w /etc/containers/ -p wa -k TA0004_T1543_containers
+-w /etc/docker/ -p wa -k TA0004_T1543_containers
+
+#///////////////////////////////////////////////////
+# T1546 - Event Triggered Execution
+#///////////////////////////////////////////////////
+
+# Monitor modifications to shell startup files
+-w ~/.bashrc -p wa -k TA0004_T1546_shell_config
+-w ~/.bash_profile -p wa -k TA0004_T1546_shell_config
+-w /etc/bash.bashrc -p wa -k TA0004_T1546_shell_config
+-w /etc/profile -p wa -k TA0004_T1546_shell_config
+
+# Monitor trap command usage
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/trap -F key=TA0004_T1546_trap
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/trap -F key=TA0004_T1546_trap
+
+# Monitor modifications to udev rules
+-w /etc/udev/rules.d/ -p wa -k TA0004_T1546_udev
+
+#///////////////////////////////////////////////////
+# T1136 - Create Account
+#///////////////////////////////////////////////////
+
+# Monitor creation of new local user accounts
+-w /etc/passwd -p wa -k TA0004_T1136_local_account
+-w /etc/shadow -p wa -k TA0004_T1136_local_account
+-w /etc/group -p wa -k TA0004_T1136_local_account
+
+
 
 
 
