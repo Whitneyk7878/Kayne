@@ -454,8 +454,8 @@
 -w /usr/bin/gdbus -p x -k TA0004_T1078_gdubs_call
 
 # setfiles
--a always,exit -F path=/usr/bin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
--a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
+# -a always,exit -F path=/usr/bin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
+# -a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=500 -F auid!=4294967295 -k -F TA0004_T1078_Valid_Accounts
 
 # dbus
 -a always,exit -F path=/lib64/dbus-1/dbus-daemon-launch-helper -F perm=x -F auid>=500 -F auid!=4294967295 -k TA0004_T1078_Valid_Accounts
@@ -1039,24 +1039,19 @@
 #///////////////////////////////////////////////////
 
 # Monitor direct systemctl stop commands
--a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=stop -k TA0040_T1489_service_stop
--a always,exit -F arch=b32 -S execve -F path=/bin/systemctl -F a0=stop -k TA0040_T1489_service_stop
+# -a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=stop -k TA0040_T1489_service_stop
 
 # Monitor direct service stop commands
--a always,exit -F arch=b64 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
--a always,exit -F arch=b32 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
+# -a always,exit -F arch=b64 -S execve -F path=/usr/sbin/service -F a0=stop -k TA0040_T1489_service_stop
 
 # Monitor stopping services using init scripts
 -a always,exit -F arch=b64 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
--a always,exit -F arch=b32 -S execve -F path=/etc/init.d/ -F a0=stop -k TA0040_T1489_service_stop
 
 # Monitor attempts to kill essential system services
 -a always,exit -F arch=b64 -S kill -F a1=9 -k TA0040_T1489_service_stop
--a always,exit -F arch=b32 -S kill -F a1=9 -k TA0040_T1489_service_stop
 
 # Monitor disabling of services via systemctl
 -a always,exit -F arch=b64 -S execve -F path=/bin/systemctl -F a0=disable -k TA0040_T1489_service_disable
--a always,exit -F arch=b32 -S execve -F path=/bin/systemctl -F a0=disable -k TA0040_T1489_service_disable
 
 # Monitor removal of service unit files
 -w /etc/systemd/system/ -p wa -k TA0040_T1489_service_disable
