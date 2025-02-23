@@ -377,6 +377,118 @@
 -w /etc/shadow -p wa -k TA0004_T1136_local_account
 -w /etc/group -p wa -k TA0004_T1136_local_account
 
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+# TA0005 Defense Evasion
+#//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#///////////////////////////////////////////////////
+# T1548 - Abuse Elevation Control Mechanism
+#///////////////////////////////////////////////////
+
+# Monitor execution of privileged commands via sudo
+ -a always,exit -F arch=b64 -S execve -F path=/usr/bin/sudo -F key=TA0005_T1548_sudo
+ -a always,exit -F arch=b32 -S execve -F path=/usr/bin/sudo -F key=TA0005_T1548_sudo
+
+# Monitor modifications to sudoers file
+ -w /etc/sudoers -p wa -k TA0005_T1548_sudoers
+ -w /etc/sudoers.d/ -p wa -k TA0005_T1548_sudoers
+
+# Monitor execution of setuid/setgid binaries
+# -a always,exit -F arch=b64 -S execve -F key=TA0005_T1548_setuid
+# -a always,exit -F arch=b32 -S execve -F key=TA0005_T1548_setuid
+
+#///////////////////////////////////////////////////
+# T1036 - Masquerading
+#///////////////////////////////////////////////////
+
+# Monitor renaming of system utilities
+-w /bin/ -p wa -k TA0005_T1036_masquerading
+-w /usr/bin/ -p wa -k TA0005_T1036_masquerading
+-w /sbin/ -p wa -k TA0005_T1036_masquerading
+-w /usr/sbin/ -p wa -k TA0005_T1036_masquerading
+
+#///////////////////////////////////////////////////
+# T1562 - Impair Defenses
+#///////////////////////////////////////////////////
+
+# Monitor disabling of Linux audit system
+-w /etc/audit/auditd.conf -p wa -k TA0005_T1562_disable_audit
+-w /etc/audit/rules.d/ -p wa -k TA0005_T1562_disable_audit
+
+# NOISY CANT DO MUCH ABOUT THIS
+# Monitor clearing of bash history
+# -w ~/.bash_history -p wa -k TA0005_T1562_bash_history
+
+# Monitor firewall modifications
+-w /etc/firewalld/ -p wa -k TA0005_T1562_firewalld
+-w /etc/iptables/ -p wa -k TA0005_T1562_iptables
+-w /etc/nftables.conf -p wa -k TA0005_T1562_nftables
+
+#///////////////////////////////////////////////////
+# T1070 - Indicator Removal
+#///////////////////////////////////////////////////
+
+# Monitor log clearing activities
+-w /var/log/wtmp -p wa -k TA0005_T1070_clear_logs
+-w /var/log/btmp -p wa -k TA0005_T1070_clear_logs
+-w /var/log/messages -p wa -k TA0005_T1070_clear_logs
+-w /var/log/syslog -p wa -k TA0005_T1070_clear_logs
+-w /var/log/auth.log -p wa -k TA0005_T1070_clear_logs
+
+# CAN BE NOISY
+# Monitor file deletion activity
+-a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
+-a always,exit -F arch=b32 -S unlink,unlinkat,rename,renameat -F key=TA0005_T1070_file_deletion
+
+# Monitor timestamp modifications (Timestomping)
+-a always,exit -F arch=b64 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
+-a always,exit -F arch=b32 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
+
+#///////////////////////////////////////////////////
+# T1027 - Obfuscated Files or Information
+#///////////////////////////////////////////////////
+
+# Monitor execution of packed binaries
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/upx -F key=TA0005_T1027_packing
+-a always,exit -F arch=b32 -S execve -F path=/usr/bin/upx -F key=TA0005_T1027_packing
+
+# Monitor compiling of source code on target machine
+-w /usr/bin/gcc -p x -k TA0005_T1027_compile_after_delivery
+-w /usr/bin/make -p x -k TA0005_T1027_compile_after_delivery
+-w /usr/bin/clang -p x -k TA0005_T1027_compile_after_delivery
+
+#///////////////////////////////////////////////////
+# T1202 - Indirect Command Execution
+#///////////////////////////////////////////////////
+
+# Monitor indirect execution methods
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/eval -F key=TA0005_T1202_indirect_execution
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/exec -F key=TA0005_T1202_indirect_execution
+
+#///////////////////////////////////////////////////
+# T1553 - Subvert Trust Controls
+#///////////////////////////////////////////////////
+
+# Monitor installation of root CA certificates
+-w /etc/pki/ -p wa -k TA0005_T1553_root_cert
+-w /usr/share/ca-certificates/ -p wa -k TA0005_T1553_root_cert
+
+#///////////////////////////////////////////////////
+# T1006 - Direct Volume Access
+#///////////////////////////////////////////////////
+
+# Monitor direct access to block devices
+-w /dev/sd* -p wa -k TA0005_T1006_volume_access
+-w /dev/nvme* -p wa -k TA0005_T1006_volume_access
+
+#///////////////////////////////////////////////////
+# T1207 - Rogue Domain Controller
+#///////////////////////////////////////////////////
+
+# Monitor suspicious Samba/Winbind configurations (if system is domain-joined)
+-w /etc/samba/smb.conf -p wa -k TA0005_T1207_rogue_domain_controller
+-w /var/lib/samba/ -p wa -k TA0005_T1207_rogue_domain_controller
+
 
 
 
