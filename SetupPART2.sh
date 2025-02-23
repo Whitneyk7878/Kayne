@@ -98,8 +98,10 @@ sudo iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
 
 # HTTP/HTTPS
-#sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
-#sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
 
 # NTP (server time)
 sudo iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
@@ -112,6 +114,10 @@ sudo iptables -t filter -A OUTPUT -p tcp --dport 9997 -j ACCEPT
 # SMTP
 sudo iptables -t filter -A OUTPUT -p tcp --dport 25 -j ACCEPT
 sudo iptables -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 587 -j ACCEPT
+sudo iptables -t filter -A OUPUT -p tcp --dport 465 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 587 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 465 -j ACCEPT
 
 # POP3
 sudo iptables -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
@@ -124,6 +130,13 @@ sudo iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
+
+# LDAP traffic
+sudo iptables -t filter -A INPUT -p tcp --dport 389 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 636 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 389 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 636 -j ACCEPT
+
 
 # THESE ARE PER THE COMPETITION
 #sudo ip6tables -A INPUT -p tcp --dport 25 -j ACCEPT
@@ -252,7 +265,40 @@ echo "Updating and upgrading system packages..."
 #sudo yum update -y -q && yum upgrade -y -q
 
 
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m               Securing APACHE                        \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+# 2. Secure HTTPD Configuration
+echo "Hardening Apache HTTPD..."
+sed -i 's/ServerTokens OS/ServerTokens Prod/' /etc/httpd/conf/httpd.conf
+sed -i 's/ServerSignature On/ServerSignature Off/' /etc/httpd/conf/httpd.conf
+systemctl restart httpd
 
+echo "Apache HTTPD secured."
+
+# Prevent remote command execution in Apache
+echo "Securing Apache against remote command execution..."
+sed -i '/Options/d' /etc/httpd/conf/httpd.conf
+sed -i 's/AllowOverride All/AllowOverride None/' /etc/httpd/conf/httpd.conf
+sed -i 's/Require all granted/Require all denied/' /etc/httpd/conf/httpd.conf
+systemctl restart httpd
+
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m               Securing Roundcube                      \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
+# 5. Secure RoundcubeMail Configuration
+echo "Hardening RoundcubeMail..."
+sed -i "s/\$config\['enable_installer'\] = true;/\$config['enable_installer'] = false;/" /etc/roundcubemail/config.inc.php
+sed -i "s/\$config\['default_host'\] = '';/\$config['default_host'] = 'ssl:\/\/localhost';/" /etc/roundcubemail/config.inc.php
+
+echo "RoundcubeMail secured."
+
+# Prevent PHP remote execution
+echo "Disabling dangerous PHP functions..."
+sed -i 's/^disable_functions =.*/disable_functions = exec,system,shell_exec,passthru,popen,proc_open/' /etc/php.ini
+systemctl restart httpd
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Dovecot                    \e[0m"
@@ -384,6 +430,7 @@ sleep 1
 echo "Creating hidden directory..."
 sudo mkdir /lib/.tarkov
 # Archive and store system files
+# FIRST BACKUP
 echo "Compressing and storing system files individually..."
 sudo tar -czf /lib/.tarkov/shadow_backup.tar.gz /etc/shadow
 sudo tar -czf /lib/.tarkov/passwd_backup.tar.gz /etc/passwd
@@ -394,6 +441,68 @@ sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
 sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
 sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
 sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
+
+#SECOND BACKUP
+# backup_mailserver.sh
+#
+# A simple script to back up Postfix, Dovecot, Roundcube config, mail data, 
+# and the Roundcube MySQL database.
+
+# 1. Set variables
+BACKUP_DIR="/var/backups/mailserver"  # Where to store backup tarballs
+NOW=$(date +%Y%m%d_%H%M%S)           # Timestamp
+BACKUP_FILE="$BACKUP_DIR/mailserver_backup_$NOW.tar.gz"
+
+# 2. Roundcube Database Credentials
+#DB_NAME="roundcubemail"
+#DB_USER="root"
+#DB_PASS="YOUR_DB_PASSWORD"
+
+# 3. Additional directories to back up
+POSTFIX_DIR="/etc/postfix"
+DOVECOT_DIR="/etc/dovecot"
+ROUNDCUBE_CONF_DIR="/etc/roundcubemail"
+MAIL_DIR="/var/mail"                 # Adjust if your mail is elsewhere
+APACHE_CONF_DIR="/etc/httpd/conf"    # Optional
+APACHE_CONF_D_DIR="/etc/httpd/conf.d"
+#SSL_CERT_DIR="/etc/pki/tls"
+
+# 4. Create backup directory if it doesn't exist
+if [ ! -d "$BACKUP_DIR" ]; then
+    mkdir -p "$BACKUP_DIR"
+fi
+
+# 5. Dump Roundcube MySQL database
+#echo "Dumping Roundcube database..."
+#mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" > /tmp/roundcube.sql
+#if [ $? -ne 0 ]; then
+#    echo "Error: mysqldump failed. Exiting."
+#    exit 1
+#fi
+
+# 6. Create tarball of relevant directories + DB dump
+echo "Creating tar archive..."
+tar -czf "$BACKUP_FILE" \
+    "$POSTFIX_DIR" \
+    "$DOVECOT_DIR" \
+    "$ROUNDCUBE_CONF_DIR" \
+    "$MAIL_DIR" \
+    "$APACHE_CONF_DIR" \
+    "$APACHE_CONF_D_DIR" \
+#    "$SSL_CERT_DIR" \
+#    /tmp/roundcube.sql \
+    /etc/aliases \
+    /etc/aliases.db 2>/dev/null
+
+# 7. Remove temporary DB dump
+#rm -f /tmp/roundcube.sql
+
+# 8. Confirm backup is complete
+if [ -f "$BACKUP_FILE" ]; then
+    echo "Backup successful: $BACKUP_FILE"
+else
+    echo "Backup failed!"
+fi
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
