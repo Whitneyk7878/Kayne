@@ -300,17 +300,16 @@
 # T1548 - Abuse Elevation Control Mechanism
 #///////////////////////////////////////////////////
 
+# THIS ONE CAN BE NOISY
 # Monitor execution of privileged commands via sudo
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/sudo -F key=TA0004_T1548_sudo
--a always,exit -F arch=b32 -S execve -F path=/usr/bin/sudo -F key=TA0004_T1548_sudo
 
 # Monitor modifications to sudoers file
 -w /etc/sudoers -p wa -k TA0004_T1548_sudoers
 -w /etc/sudoers.d/ -p wa -k TA0004_T1548_sudoers
 
 # Monitor setuid and setgid file executions
--a always,exit -F arch=b64 -S execve -F key=TA0004_T1548_setuid
--a always,exit -F arch=b32 -S execve -F key=TA0004_T1548_setuid
+# -a always,exit -F arch=b64 -S execve -F key=TA0004_T1548_setuid
 -w /usr/bin/su -p wa -k TA0004_T1548_su
 
 #///////////////////////////////////////////////////
@@ -319,7 +318,6 @@
 
 # Monitor ptrace usage for process manipulation
 -a always,exit -F arch=b64 -S ptrace -F key=TA0004_T1055_ptrace
--a always,exit -F arch=b32 -S ptrace -F key=TA0004_T1055_ptrace
 
 # Monitor VDSO hijacking attempts
 -w /proc/self/maps -p wa -k TA0004_T1055_vdso
@@ -366,7 +364,6 @@
 
 # Monitor trap command usage
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/trap -F key=TA0004_T1546_trap
--a always,exit -F arch=b32 -S execve -F path=/usr/bin/trap -F key=TA0004_T1546_trap
 
 # Monitor modifications to udev rules
 -w /etc/udev/rules.d/ -p wa -k TA0004_T1546_udev
