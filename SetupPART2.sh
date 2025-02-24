@@ -288,6 +288,8 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Securing Roundcube                      \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
+sudo systemctl start httpd
+sudo systemctl enable httpd
 # 5. Secure RoundcubeMail Configuration
 echo "Hardening RoundcubeMail..."
 sed -i "s/\$config\['enable_installer'\] = true;/\$config['enable_installer'] = false;/" /etc/roundcubemail/config.inc.php
