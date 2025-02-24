@@ -514,7 +514,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-#Remove Compilers
+# Remove Compilers
 sudo yum remove libgcc clang make cmake automake autoconf -y -q
 
 
@@ -607,17 +607,17 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Installing Suricata IDS                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-echo "installing suricata.."
-sudo yum install suricata -y -q
-sudo yum install jq -y -q
-echo "Installing the latest emerging threats rules.."
+# echo "installing suricata.."
+# sudo yum install suricata -y -q
+# sudo yum install jq -y -q
+# echo "Installing the latest emerging threats rules.."
 # I HAVE THIS COMMENTED OUT because it breaks my poor little old fedora box to have so many rules that arent compatible
 # So i have to use the default ruleset
 # Uncomment it if you are on a better distro than me
 # sudo wget https://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz -O /tmp/emerging.rules.tar.gz
 # sudo tar -xvzf /tmp/emerging.rules.tar.gz -C /etc/suricata/
-sudo systemctl enable suricata
-sudo systemctl start suricata
+# sudo systemctl enable suricata
+# sudo systemctl start suricata
 # Go into the /etc/suricata/suricata.yaml file and set af-packet (around page 13) to your ens32
 # resource: https://www.youtube.com/watch?v=UXKbh0jPPpg
 # Commands: jq '.' /var/log/suricata/eve.json | less
@@ -638,9 +638,12 @@ sudo systemctl start suricata
 #sudo tripwire --init
 
 
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m                  Install XFCE                        \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
+sudo yum groupinstall "XFCE" "X Window System" -y -q
 
-sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
 
