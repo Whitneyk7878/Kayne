@@ -551,9 +551,6 @@ chmod 600 /etc/at.deny
 chmod 600 /etc/crontab
 
 
-#Running auditctl rules again because it doesnt like it the first time
-sudo auditctl -R /etc/audit/rules.d/audit.rules
-
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     NTP                         \e[0m"
