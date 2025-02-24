@@ -644,7 +644,23 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 sudo yum groupinstall "XFCE" "X Window System" -y -q
 
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
+sudo mv /usr/bin/curl /usr/bin/oldcurl
+sudo mv /usr/bin/wget /usr/bin/oldwget
+sudo mv /usr/bin/ftp  /usr/bin/oldftp
+sudo mv /usr/bin/sftp /usr/bin/oldsftp
+sudo mv /usr/bin/aria2c /usr/bin/oldaria2c
+sudo mv /usr/bin/nc /usr/bin/oldnc
+sudo mv /usr/bin/socat /usr/bin/oldsocat
+sudo mv /usr/bin/telnet /usr/bin/oldtelnet
+sudo mv /usr/bin/tftp /usr/bin/oldtftp
+sudo mv /usr/bin/ncat    /usr/bin/oldncat  
+sudo mv /usr/bin/gdb     /usr/bin/oldgdb    
+sudo mv /usr/bin/strace  /usr/bin/oldstrace  
+sudo mv /usr/bin/ltrace  /usr/bin/oldltrace  
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
