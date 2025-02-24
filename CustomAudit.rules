@@ -47,6 +47,14 @@
 # T1059 - Command and Scripting Interpreter Execution
 #///////////////////////////////////////////////////
 
+# Monitor execution of tmux
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/tmux -F key=TA0002_T1059_tmux
+-a always,exit -F arch=b64 -S execve -F path=/usr/local/bin/tmux -F key=TA0002_T1059_tmux
+
+# Monitor execution of screen
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/screen -F key=TA0002_T1059_screen
+-a always,exit -F arch=b64 -S execve -F path=/usr/local/bin/screen -F key=TA0002_T1059_screen
+
 # Monitor shell execution
 -a always,exit -F arch=b64 -S execve -F path=/bin/sh -F key=TA0002_T1059_shell
 -a always,exit -F arch=b64 -S execve -F path=/bin/bash -F key=TA0002_T1059_shell
