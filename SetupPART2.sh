@@ -418,6 +418,12 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 # This makes it so that se linux is enforcing policies, not just logging violations
 echo "Setting SE to enforce mode and turning off permissive.."
 sudo sed -i 's/^SELINUX=permissive/SELINUX=enforcing/' /etc/selinux/config
+#THESE ARE FOR POSTFIX TO WORK BECAUSE SE LINUX CAN BREAK IT
+sudo setsebool -P allow_postfix_local_write_mail_spool on
+sudo setsebool -P httpd_can_sendmail on
+sudo setsebool -P allow_postfix_local_write_mail_spool=1
+sudo systemctl restart postfix
+
 
 
 
