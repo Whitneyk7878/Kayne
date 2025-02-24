@@ -396,9 +396,9 @@ sudo systemctl enable auditd
 sudo systemctl start auditd
 # Download audit rules and apply them
 echo "Setting up audit rules..."
-sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/audit.rules
+sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/CustomAudit.rules
 sudo rm /etc/audit/rules.d/audit.rules
-sudo mv audit.rules /etc/audit/rules.d/
+sudo mv CustomAudit.rules /etc/audit/rules.d/
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
