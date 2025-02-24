@@ -641,9 +641,9 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 sudo yum groupinstall "XFCE" "X Window System" -y -q
 
-#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-#echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
-#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 sudo mv /usr/bin/curl /usr/bin/oldcurl
 sudo mv /usr/bin/wget /usr/bin/oldwget
