@@ -165,11 +165,11 @@ sudo systemctl stop tftp && sudo systemctl disable tftp
 sudo systemctl stop certmonger && sudo systemctl disable certmonger
 sudo systemctl stop cgconfig && sudo systemctl disable cgconfig
 sudo systemctl stop cgred && sudo systemctl disable cgred
-sudo systemctl stop cpuspeed && sudo systemctl disable cpuspeed
-sudo systemctl stop irqbalance && sudo systemctl disable irqbalance
+# sudo systemctl stop cpuspeed && sudo systemctl disable cpuspeed
+# sudo systemctl stop irqbalance && sudo systemctl disable irqbalance
 sudo systemctl stop kdump && sudo systemctl disable kdump
 sudo systemctl stop mdmonitor && sudo systemctl disable mdmonitor
-sudo systemctl stop messagebus && sudo systemctl disable messagebus
+# sudo systemctl stop messagebus && sudo systemctl disable messagebus
 sudo systemctl stop netconsole && sudo systemctl disable netconsole
 # sudo systemctl stop ntpdate && sudo systemctl disable ntpdate
 sudo systemctl stop oddjobd && sudo systemctl disable oddjobd
