@@ -340,13 +340,6 @@
 -w /var/lib/containers/ -p wa -k TA0003_T1525_ImplantInternalImage
 
 #///////////////////////////////////////////////////
-# T1556 - Modify Authentication Process
-#///////////////////////////////////////////////////
-
-# Monitor modifications to authentication modules
--w /etc/pam.d/ -p wa -k TA0003_T1556_ModifyAuthenticationProcess
-
-#///////////////////////////////////////////////////
 # T1205 - Traffic Signaling
 #///////////////////////////////////////////////////
 
@@ -414,6 +407,9 @@
 ### Unsuccessful Modification
 -a always,exit -F arch=b64 -S rename -S renameat -S truncate -S chmod -S setxattr -S lsetxattr -S removexattr -S lremovexattr -F exit=-EACCES -k TA0003_T1556_file_modification
 -a always,exit -F arch=b64 -S rename -S renameat -S truncate -S chmod -S setxattr -S lsetxattr -S removexattr -S lremovexattr -F exit=-EPERM -k TA0003_T1556_file_modification
+
+# Monitor modifications to authentication modules
+-w /etc/pam.d/ -p wa -k TA0003_T1556_ModifyAuthenticationProcess
 
 
 #//////////////////////////////////////////////////////////////////////////////////////////////////////
