@@ -664,6 +664,7 @@
 -w /dev/sda1 -p wa -k TA0005_T1006_volume_access
 -w /dev/sda2 -p wa -k TA0005_T1006_volume_access
 -w /dev/nvram -p wa -k TA0005_T1006_volume_access
+-w /dev -p wa -k TA0005_T1006_volume_access
 
 #///////////////////////////////////////////////////
 # T1207 - Rogue Domain Controller
