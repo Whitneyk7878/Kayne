@@ -330,7 +330,7 @@
 -w /etc/ld.so.preload -p wa -k TA0003_T1574_HijackExecutionFlow
 -w /etc/environment -p wa -k TA0003_T1574_HijackExecutionFlow
 -w /etc/ld.so.conf -p wa -k TA0003_T1574_HijackExecutionFlow
--a always,exit -F env=LD_PRELOAD -F key=TA0003_T1574_HijackExecutionFlow
+# -a always,exit -F env=LD_PRELOAD -F key=TA0003_T1574_HijackExecutionFlow
 
 #///////////////////////////////////////////////////
 # T1525 - Implant Internal Image
@@ -630,7 +630,7 @@
 # Monitor timestamp modifications (Timestomping)
 # -a always,exit -F arch=b64 -S utime,utimes,futimesat,futimens -F key=TA0005_T1070_timestomp
 -w /sbin/debugfs -p x -k TA0005_T1070_timestompDEBUGFS
--a always,exit -F arch=b64 -S utime -S utimensat -S futimens -k TA0005_T1070_timestomp
+-a always,exit -F arch=b64 -S utime -S utimensat -k TA0005_T1070_timestomp
 
 
 
