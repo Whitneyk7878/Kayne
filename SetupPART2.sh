@@ -358,13 +358,13 @@ echo "Installing fail2ban..."
 yum install -y -q fail2ban
 # Create fail2ban log file
 echo "Creating fail2ban log file..."
-touch /var/log/fail2banlog
+# touch /var/log/fail2banlog
 # Backup and configure fail2ban
 echo "Configuring fail2ban..."
 cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 # Putting in the contents to the jail file
 sed -i '/\[dovecot\]/a enabled = true\nmaxretry = 5\nbantime = 3600' /etc/fail2ban/jail.local
-sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2ban/jail.local
+# sed -i 's|logpath = %(dovecot_log)s|logpath = /var/log/fail2banlog|g' /etc/fail2ban/jail.local
 #FOR THE COMPETITION
 # Apache Stuff
 #echo "Making an Apache jail..."
