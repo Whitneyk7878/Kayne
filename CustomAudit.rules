@@ -500,8 +500,8 @@
 #///////////////////////////////////////////////////
 
 # Monitor modifications to shell startup files
-# -w ~/.bashrc -p wa -k TA0004_T1546_shell_config
-# -w ~/.bash_profile -p wa -k TA0004_T1546_shell_config
+-w /root/.bashrc -p wa -k TA0004_T1546_shell_config
+-w /root/.bash_profile -p wa -k TA0004_T1546_shell_config
 -w /etc/bash.bashrc -p wa -k TA0004_T1546_shell_config
 -w /etc/profile -p wa -k TA0004_T1546_shell_config
 
