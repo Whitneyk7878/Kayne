@@ -664,11 +664,11 @@
 #///////////////////////////////////////////////////
 
 # Monitor direct access to block devices
--w /dev/sda -p wa -k TA0005_T1006_volume_access
--w /dev/sda1 -p wa -k TA0005_T1006_volume_access
--w /dev/sda2 -p wa -k TA0005_T1006_volume_access
--w /dev/nvram -p wa -k TA0005_T1006_volume_access
--w /dev -p wa -k TA0005_T1006_volume_access
+#-w /dev/sda -p wa -k TA0005_T1006_volume_access
+#-w /dev/sda1 -p wa -k TA0005_T1006_volume_access
+#-w /dev/sda2 -p wa -k TA0005_T1006_volume_access
+#-w /dev/nvram -p wa -k TA0005_T1006_volume_access
+#-w /dev -p wa -k TA0005_T1006_volume_access
 
 #///////////////////////////////////////////////////
 # T1207 - Rogue Domain Controller
@@ -695,7 +695,7 @@
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/getent -F key=TA0007_T1087_account_discovery
 
 # Monitor access to /etc/passwd
--w /etc/passwd -p r -k TA0007_T1087_account_discovery
+# -w /etc/passwd -p r -k TA0007_T1087_account_discovery
 
 #///////////////////////////////////////////////////
 # T1010 - Application Window Discovery
