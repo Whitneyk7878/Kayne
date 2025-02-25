@@ -300,6 +300,10 @@ echo "RoundcubeMail secured."
 # Prevent PHP remote execution
 echo "Disabling dangerous PHP functions..."
 sed -i 's/^disable_functions =.*/disable_functions = exec,system,shell_exec,passthru,popen,proc_open/' /etc/php.ini
+# Turn Expose PHP off
+echo -e "Turning off expose_php.."
+sudo sed -i 's/^expose_php\s*=\s*On/expose_php = Off/' /etc/php.ini
+
 systemctl restart httpd
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
