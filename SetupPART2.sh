@@ -384,7 +384,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update and install necessary packages
 echo "Installing required packages..."
-sudo yum install -y -q aide rkhunter clamav clamd clamav-update
+sudo yum install -y -q chkrootkit aide rkhunter clamav clamd clamav-update
 # Download and set up monitoring script
 echo "Downloading monitoring script..."
 sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
