@@ -233,7 +233,9 @@ cat <<-EOF >> /etc/sysctl.conf
 fs.suid_dumpable = 0
 kernel.exec_shield = 1
 kernel.randomize_va_space = 2
+# CHANGED THIS TEST THIS BEFORE LOCKING IT IN -----------------------------------------------------------------------
 net.ipv4.ip_forward = 1
+# ---------------------------------------------------------------------
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.default.send_redirects = 0
 net.ipv4.tcp_max_syn_backlog = 1280
@@ -269,7 +271,7 @@ echo -e "\e[38;5;46m               Update + Upgrade                       \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Update system
-echo "Updating and upgrading system packages..."
+echo "Updating and upgrading system packages. This may take a while..."
 #sudo yum update -y -q && yum upgrade -y -q
 
 
@@ -410,6 +412,7 @@ sudo systemctl enable auditd
 sudo systemctl start auditd
 # Download audit rules and apply them
 echo "Setting up audit rules..."
+# MAKE SURE TO CHANGE THIS BEFORE YOU GO INTO COMPETITION
 sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/CustomAudit.rules
 sudo rm /etc/audit/rules.d/audit.rules
 sudo mv CustomAudit.rules /etc/audit/rules.d/
