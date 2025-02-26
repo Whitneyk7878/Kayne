@@ -69,10 +69,18 @@ echo -e "\e[38;5;46m                     Firewall                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 sudo yum install iptables-services -y -q
-sudo systemctl stop firewalld
-sudo systemctl disable firewalld
-sudo systemctl enable iptables
-sudo systemctl start iptables
+echo "stopping alternate firewall services.."
+# More like firewall-mid
+sudo systemctl stop firewalld && sudo systemctl disable firewalld && sudo systemctl mask firewalld
+sudo dnf remove firewalld -y -q
+# More like nf-mid
+sudo systemctl stop nftables && sudo systemctl disable nftables && sudo systemctl mask nftables
+sudo systemctl mask nftables -y -q
+# Install and setup IPTABLES
+echo "Starting IPTABLES..."
+sudo yum install iptables iptables-services -y -q
+# Enable and start IPTABLES
+sudo systemctl enable iptables && sudo systemctl start iptables
 
 # Empty all rules
 sudo iptables -t filter -F
@@ -155,7 +163,7 @@ echo -e "\e[38;5;46m                Stuff Removal                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 #Remove Stuff I Dont like
-yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y -q
+sudo yum remove sshd xinetd telnet-server rsh-server telnet rsh ypbind ypserv tftp-server cronie-anacron bind vsftpd squid net-snmpd -y -q
 sudo systemctl stop xinetd && sudo systemctl disable xinetd
 sudo systemctl stop rexec && sudo systemctl disable rexec
 sudo systemctl stop rsh && sudo systemctl disable rsh
@@ -206,7 +214,7 @@ systemctl disable netfs
 systemctl disable nfs
 
 #Remove hacker coding languages
-#sudo yum remove -q -y ruby* java* perl* mysql* mariadb* python* nodejs* php*
+#sudo yum remove -q -y ruby* java* perl* mysql* python* nodejs* php*
 #THIS IS FOR COMP
 sudo yum remove -q -y ruby* java* perl* python* nodejs*
 
@@ -225,7 +233,7 @@ cat <<-EOF >> /etc/sysctl.conf
 fs.suid_dumpable = 0
 kernel.exec_shield = 1
 kernel.randomize_va_space = 2
-net.ipv4.ip_forward = 0
+net.ipv4.ip_forward = 1
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.default.send_redirects = 0
 net.ipv4.tcp_max_syn_backlog = 1280
