@@ -323,6 +323,9 @@ sudo sed -i 's/^expose_php\s*=\s*On/expose_php = Off/' /etc/php.ini
 # Disable functions in PHP
 sudo sed -i '/^\s*disable_functions\s*=/d' /etc/php.ini && sudo sh -c 'echo "disable_functions = exec,shell_exec,system,passthru,popen,proc_open,phpinfo,eval" >> /etc/php.ini'
 
+# Disabling allow_url_fopen and allow_url_include helps prevent remote file inclusion attacks and arbitrary code execution from external sources.
+sed -i -e '/^[;\s]*allow_url_fopen\s*=/d' -e '/^[;\s]*allow_url_include\s*=/d' -e '$ a allow_url_fopen = Off\nallow_url_include = Off' /etc/php.ini
+
 systemctl restart httpd
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
