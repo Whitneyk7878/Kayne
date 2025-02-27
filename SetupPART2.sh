@@ -226,7 +226,6 @@ sleep 1
 # Disable core dumps for users
 echo -e "Disabling core dumps for users"
 echo "* hard core 0" >> /etc/security/limits.conf
-
 # Secure sysctl.conf
 echo -e "Securing sysctl.conf"
 cat <<-EOF >> /etc/sysctl.conf
@@ -304,6 +303,9 @@ sudo systemctl enable httpd
 echo "Hardening RoundcubeMail..."
 sed -i "s/\$config\['enable_installer'\] = true;/\$config['enable_installer'] = false;/" /etc/roundcubemail/config.inc.php
 sed -i "s/\$config\['default_host'\] = '';/\$config['default_host'] = 'ssl:\/\/localhost';/" /etc/roundcubemail/config.inc.php
+
+
+
 
 echo "RoundcubeMail secured."
 
