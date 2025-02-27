@@ -303,11 +303,12 @@ sudo systemctl enable httpd
 echo "Hardening RoundcubeMail..."
 sed -i "s/\$config\['enable_installer'\] = true;/\$config['enable_installer'] = false;/" /etc/roundcubemail/config.inc.php
 sed -i "s/\$config\['default_host'\] = '';/\$config['default_host'] = 'ssl:\/\/localhost';/" /etc/roundcubemail/config.inc.php
-
-
-
-
 echo "RoundcubeMail secured."
+systemctl restart httpd
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m                     Securing PHP                     \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
 # Prevent PHP remote execution
 echo "Disabling dangerous PHP functions..."
@@ -315,6 +316,11 @@ sed -i 's/^disable_functions =.*/disable_functions = exec,system,shell_exec,pass
 # Turn Expose PHP off
 echo -e "Turning off expose_php.."
 sudo sed -i 's/^expose_php\s*=\s*On/expose_php = Off/' /etc/php.ini
+# Disable functions in PHP
+sudo sed -i '/^\s*disable_functions\s*=/d' /etc/php.ini && sudo sh -c 'echo "disable_functions = exec,shell_exec,system,passthru,popen,proc_open,phpinfo,eval" >> /etc/php.ini'
+
+
+
 
 systemctl restart httpd
 
