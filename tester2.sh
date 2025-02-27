@@ -1,9 +1,11 @@
 #!/bin/bash
-#
-#sed -i '/\[apache-auth\]/,/^\[/{/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d};/\[apache-auth\]/a enabled = true\nbantime = 3600\nmaxretry = 5' /etc/fail2ban/jail.conf
-
-#sed -i '/\[roundcube-auth\]/,/^\[/{/enabled\s*=/d};/\[roundcube-auth\]/a enabled = true' /etc/fail2ban/jail.conf
-
-sed -i '/\[dovecot\]/,/^\[/{/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d};/\[dovecot\]/a enabled = true\nbantime = 3600\nmaxretry = 5' /etc/fail2ban/jail.conf
-
-#sed -i '/\[postfix\]/,/^\[/{/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d};/\[postfix\]/a enabled = true\nbantime = 3600\nmaxretry = 5' /etc/fail2ban/jail.conf
+yum install -y fail2ban
+touch /root/Downloads/fail2ban.log
+for jail in dovecot postfix apache-auth roundcube-auth
+do
+sed -i "/^\s*\[$jail\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}" /etc/fail2ban/jail.local
+sed -i "/\[$jail\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /root/Downloads/fail2ban.log" /etc/fail2ban/jail.local
+done
+systemctl enable fail2ban
+systemctl start fail2ban
+sudo fail2ban-client status
