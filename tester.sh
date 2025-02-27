@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 #sed -i '/\[apache-auth\]/,/^\[/{/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d};/\[apache-auth\]/a enabled = true\nbantime = 3600\nmaxretry = 5' /etc/fail2ban/jail.local
 
 #sed -i '/\[roundcube-auth\]/,/^\[/{/enabled\s*=/d};/\[roundcube-auth\]/a enabled = true' /etc/fail2ban/jail.local
