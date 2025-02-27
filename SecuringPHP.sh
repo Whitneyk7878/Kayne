@@ -25,6 +25,3 @@ if [[ ! -f "$PHP_INI" ]]; then
   exit 1
 fi
 
-# 2) Backup php.ini
-echo "Backing up $PHP_INI to $PHP_INI_BAK ..."
-cp -
