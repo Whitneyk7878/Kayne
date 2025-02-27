@@ -376,7 +376,7 @@ echo "Installing fail2ban..."
 yum install -y -q fail2ban
 # Create fail2ban log file
 echo "Creating fail2ban log file..."
-# touch /var/log/fail2ban.log
+touch /var/log/fail2ban.log
 # Backup and configure fail2ban
 echo "Configuring fail2ban..."
 cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
