@@ -705,6 +705,10 @@ FILES=(
     /etc/resolv.conf
     /etc/sysctl.conf
     /etc/selinux/config
+    /etc/roundcubemail
+    /etc/httpd
+    /etc/dovecot
+    /etc/postfix
 )
 
 # Loop through each file and set it immutable if it exists
