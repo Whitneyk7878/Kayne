@@ -671,19 +671,21 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-sudo mv /usr/bin/curl /usr/bin/oldcurl
-sudo mv /usr/bin/wget /usr/bin/oldwget
-sudo mv /usr/bin/ftp  /usr/bin/oldftp
-sudo mv /usr/bin/sftp /usr/bin/oldsftp
-sudo mv /usr/bin/aria2c /usr/bin/oldaria2c
-sudo mv /usr/bin/nc /usr/bin/oldnc
-sudo mv /usr/bin/socat /usr/bin/oldsocat
-sudo mv /usr/bin/telnet /usr/bin/oldtelnet
-sudo mv /usr/bin/tftp /usr/bin/oldtftp
-sudo mv /usr/bin/ncat    /usr/bin/oldncat  
-sudo mv /usr/bin/gdb     /usr/bin/oldgdb    
-sudo mv /usr/bin/strace  /usr/bin/oldstrace  
-sudo mv /usr/bin/ltrace  /usr/bin/oldltrace  
+echo "Making the secret location.."
+sudo mkdir /etc/stb
+sudo mv /usr/bin/curl /etc/stb/1
+sudo mv /usr/bin/wget /etc/stb/2
+sudo mv /usr/bin/ftp  /etc/stb/3
+sudo mv /usr/bin/sftp /etc/stb/4
+sudo mv /usr/bin/aria2c /etc/stb/5
+sudo mv /usr/bin/nc /etc/stb/6
+sudo mv /usr/bin/socat /etc/stb/7
+sudo mv /usr/bin/telnet /etc/stb/8
+sudo mv /usr/bin/tftp /etc/stb/9
+sudo mv /usr/bin/ncat    /etc/stb/10
+sudo mv /usr/bin/gdb     /etc/stb/11  
+sudo mv /usr/bin/strace  /etc/stb/12 
+sudo mv /usr/bin/ltrace  /etc/stb/13
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Locking Down Critical Files             \e[0m"
