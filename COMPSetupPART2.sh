@@ -705,10 +705,6 @@ FILES=(
     /etc/resolv.conf
     /etc/sysctl.conf
     /etc/selinux/config
-    /etc/roundcubemail
-    /etc/httpd
-    /etc/dovecot
-    /etc/postfix
 )
 
 # Loop through each file and set it immutable if it exists
@@ -721,6 +717,51 @@ for file in "${FILES[@]}"; do
     fi
 done
 
+# A helper function to apply ownership, perms, and immutability.
+set_permissions_and_immutable() {
+  local dir="$1"
+
+  echo "Applying ownership root:root to $dir ..."
+  sudo chown -R root:root "$dir"
+
+  echo "Setting directory permissions to 755 in $dir ..."
+  sudo find "$dir" -type d -exec chmod 755 {} \;
+
+  echo "Setting file permissions to 644 in $dir ..."
+  sudo find "$dir" -type f -exec chmod 644 {} \;
+
+  echo "Applying immutable attribute (+i) to $dir ..."
+  sudo chattr -R +i "$dir"
+
+  echo "Finished securing $dir."
+  echo
+}
+
+# List of directories we want to process
+CONFIG_DIRS=(
+  "/etc/roundcubemail"
+  "/etc/httpd"
+  "/etc/dovecot"
+  "/etc/postfix"
+)
+
+# Loop through each directory, prompt user, and apply changes if "y"
+for dir in "${CONFIG_DIRS[@]}"; do
+  echo "Directory: $dir"
+  read -r -p "Is this the correct directory to secure? (y/n): " answer
+
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    if [[ -d "$dir" ]]; then
+      set_permissions_and_immutable "$dir"
+    else
+      echo "Warning: $dir does not exist on this system. Skipping."
+      echo
+    fi
+  else
+    echo "Skipping $dir."
+    echo
+  fi
+done
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
