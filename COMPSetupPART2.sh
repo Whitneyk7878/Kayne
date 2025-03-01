@@ -380,10 +380,10 @@ echo "Installing fail2ban..."
 yum install -y -q fail2ban
 # Create fail2ban log file
 echo "Creating fail2ban log file..."
-touch /var/log/fail2ban.log
+sudo touch /var/log/fail2ban.log
 # Backup and configure fail2ban
 echo "Configuring fail2ban..."
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
 sed -i '/^\s*\[dovecot\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
 sed -i '/\[dovecot\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
 sed -i '/^\s*\[postfix\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
