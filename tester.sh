@@ -1,21 +1,38 @@
 #!/bin/bash
-echo "Configuring Postfix..."
-POSTFIX_CONFIG="/etc/postfix/main.cf"
 
-declare -A POSTFIX_SETTINGS=(
-    ["smtpd_client_connection_count_limit"]="10"
-    ["smtpd_client_connection_rate_limit"]="60"
-    ["smtpd_error_sleep_time"]="5s"
-    ["smtpd_soft_error_limit"]="10"
-    ["smtpd_hard_error_limit"]="20"
-    ["message_size_limit"]="10485760"
-    ["smtpd_recipient_restrictions"]="reject_unauth_destination"
-)
+echo "Clearing mail logs and mailboxes for all users..."
 
-for key in "${!POSTFIX_SETTINGS[@]}"; do
-    if ! grep -q "^$key" "$POSTFIX_CONFIG"; then
-        echo "$key = ${POSTFIX_SETTINGS[$key]}" >> "$POSTFIX_CONFIG"
+# MAIL_LOG="/var/log/maillog"
+MAIL_BASE="/home"
+
+# Ensure only root can run the script
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root!"
+   exit 1
+fi
+
+# Iterate over users and clear mailboxes
+for user in $(ls $MAIL_BASE); do
+    MAILDIR="$MAIL_BASE/$user/Maildir"
+    
+    if [[ -d "$MAILDIR" ]]; then
+        echo "Clearing emails for user: $user"
+
+        # Delete all emails in cur, new, and tmp
+        rm -rf "$MAILDIR/cur/*" "$MAILDIR/new/*" "$MAILDIR/tmp/*"
+
+        # Reset ownership (to avoid permission issues)
+        chown -R "$user:$user" "$MAILDIR"
     fi
 done
 
-sudo systemctl restart postfix
+# Clear mail log
+#echo "Clearing mail logs..."
+#cat /dev/null > $MAIL_LOG
+
+# Restart mail services to apply changes
+echo "Restarting Postfix and Dovecot..."
+systemctl restart postfix
+systemctl restart dovecot
+
+echo "All mailboxes"
