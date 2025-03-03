@@ -1,49 +1,111 @@
 #!/bin/bash
+# Consolidated Backup Script for Fedora 21 with Apache, Postfix, Dovecot, Roundcube, and MariaDB
+# Assumes a full system compromise so this backup aims to include all configurations and databases needed to restore services.
 
-echo "Clearing mail logs and mailboxes for all users..."
+set -e  # Exit on any error
 
-#MAIL_LOG="/var/log/maillog"
-MAIL_BASE="/home"
+# Set a timestamp for backup filenames
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-# Ensure only root can run the script
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root!"
-   exit 1
+# Define backup destination directories
+BACKUP_DIR1="/etc/ftb"
+BACKUP_DIR2="/etc/.tarkov"
+
+# Create backup directories if they don't exist
+mkdir -p "$BACKUP_DIR1"
+mkdir -p "$BACKUP_DIR2"
+
+# Create a temporary working directory for backup files
+TMP_DIR="/tmp/backup_$TIMESTAMP"
+mkdir -p "$TMP_DIR"
+
+echo "Starting backup at $(date)"
+
+##############################
+# Backup Apache
+##############################
+# Assumes Apache configuration is in /etc/httpd and web data in /var/www
+mkdir -p "$TMP_DIR/apache"
+if [ -d /etc/httpd ]; then
+  cp -a /etc/httpd "$TMP_DIR/apache/"
+else
+  echo "Warning: /etc/httpd not found."
+fi
+if [ -d /var/www ]; then
+  cp -a /var/www "$TMP_DIR/apache/"
+else
+  echo "Warning: /var/www not found."
 fi
 
-# Iterate over users and clear mailboxes
-for user in $(ls $MAIL_BASE); do
-    MAILDIR="$MAIL_BASE/$user/Maildir"
-    
-    if [[ -d "$MAILDIR" ]]; then
-        echo "Clearing emails for user: $user"
+##############################
+# Backup Postfix
+##############################
+# Assumes Postfix config is in /etc/postfix
+mkdir -p "$TMP_DIR/postfix"
+if [ -d /etc/postfix ]; then
+  cp -a /etc/postfix "$TMP_DIR/postfix/"
+else
+  echo "Warning: /etc/postfix not found."
+fi
 
-        # Delete all emails in cur, new, and tmp
-        rm -rf "$MAILDIR/cur/"* "$MAILDIR/new/"* "$MAILDIR/tmp/"*
+##############################
+# Backup Dovecot
+##############################
+# Assumes Dovecot config is in /etc/dovecot
+mkdir -p "$TMP_DIR/dovecot"
+if [ -d /etc/dovecot ]; then
+  cp -a /etc/dovecot "$TMP_DIR/dovecot/"
+else
+  echo "Warning: /etc/dovecot not found."
+fi
 
-        # Reset ownership (to avoid permission issues)
-        chown -R "$user:$user" "$MAILDIR"
-    fi
-done
+##############################
+# Backup Roundcube
+##############################
+# Assumes Roundcube config is in /etc/roundcube and its web files in /usr/share/roundcube
+mkdir -p "$TMP_DIR/roundcube"
+if [ -d /etc/roundcube ]; then
+  cp -a /etc/roundcube "$TMP_DIR/roundcube/"
+else
+  echo "Warning: /etc/roundcube not found."
+fi
+if [ -d /usr/share/roundcube ]; then
+  cp -a /usr/share/roundcube "$TMP_DIR/roundcube/"
+else
+  echo "Warning: /usr/share/roundcube not found."
+fi
 
-# Properly clear mail logs
-#echo "Clearing mail logs..."
-#if [[ -f "$MAIL_LOG" ]]; then
-#    systemctl stop rsyslog
-#    systemctl stop postfix
-#    systemctl stop dovecot
+##############################
+# Backup MariaDB Databases
+##############################
+echo "Backing up MariaDB databases..."
+# This command dumps all databases. If a password is required, you might need to modify the command 
+# (for example, using a .my.cnf file for credentials or appending -p and entering the password).
+mysqldump --all-databases --single-transaction --quick --lock-tables=false > "$TMP_DIR/all_databases_$TIMESTAMP.sql"
 
-#    echo "" > "$MAIL_LOG"  # Truncate the log file
-#    rm -f "$MAIL_LOG"       # Delete the file
-#    touch "$MAIL_LOG"       # Recreate an empty log file
-#    chmod 640 "$MAIL_LOG"   # Set correct permissions
+##############################
+# (Optional) Backup additional system configurations
+##############################
+# Uncomment the following if you wish to include the entire /etc directory:
+# cp -a /etc "$TMP_DIR/etc_full_backup"
 
-#    systemctl start rsyslog
-    systemctl start postfix
-    systemctl start dovecot
-    echo "Mail logs cleared successfully."
-#else
-#    echo "Mail log file not found!"
-#fi
+##############################
+# Create the compressed backup archive
+##############################
+BACKUP_FILE="backup_$TIMESTAMP.tar.gz"
+tar -czvf "/tmp/$BACKUP_FILE" -C "$TMP_DIR" .
 
-echo "All mailboxes and logs have been cleared!"
+##############################
+# Copy the backup archive to both destinations
+##############################
+cp "/tmp/$BACKUP_FILE" "$BACKUP_DIR1/"
+cp "/tmp/$BACKUP_FILE" "$BACKUP_DIR2/"
+
+echo "Backup completed successfully at $(date)."
+echo "Backup file: $BACKUP_FILE saved in $BACKUP_DIR1 and $BACKUP_DIR2"
+
+# Clean up temporary files
+rm -rf "$TMP_DIR"
+rm "/tmp/$BACKUP_FILE"
+
+exit 0
