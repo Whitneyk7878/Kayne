@@ -1,111 +1,53 @@
 #!/bin/bash
-# Consolidated Backup Script for Fedora 21 with Apache, Postfix, Dovecot, Roundcube, and MariaDB
-# Assumes a full system compromise so this backup aims to include all configurations and databases needed to restore services.
+# Simple Backup Script for Fedora 21 Services
+# This script zips up service directories and copies the archives
+# to two backup locations: /etc/ftb and /etc/.tarkov.
+# Services:
+#   - Apache: /etc/httpd and /var/www
+#   - Postfix: /etc/postfix
+#   - Dovecot: /etc/dovecot
+#   - Roundcube: /etc/roundcube and /usr/share/roundcube
+#   - MariaDB: /var/lib/mysql
 
-set -e  # Exit on any error
-
-# Set a timestamp for backup filenames
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+set -e
 
 # Define backup destination directories
 BACKUP_DIR1="/etc/ftb"
 BACKUP_DIR2="/etc/.tarkov"
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR1"
-mkdir -p "$BACKUP_DIR2"
+mkdir -p "$BACKUP_DIR1" "$BACKUP_DIR2"
 
-# Create a temporary working directory for backup files
-TMP_DIR="/tmp/backup_$TIMESTAMP"
-mkdir -p "$TMP_DIR"
+echo "Creating backup archives..."
 
-echo "Starting backup at $(date)"
+# Apache backup: zip the Apache configuration and web files.
+(cd / && zip -r /tmp/apache.zip etc/httpd var/www)
+echo "Apache backup created."
 
-##############################
-# Backup Apache
-##############################
-# Assumes Apache configuration is in /etc/httpd and web data in /var/www
-mkdir -p "$TMP_DIR/apache"
-if [ -d /etc/httpd ]; then
-  cp -a /etc/httpd "$TMP_DIR/apache/"
-else
-  echo "Warning: /etc/httpd not found."
-fi
-if [ -d /var/www ]; then
-  cp -a /var/www "$TMP_DIR/apache/"
-else
-  echo "Warning: /var/www not found."
-fi
+# Postfix backup: zip the postfix configuration.
+(cd / && zip -r /tmp/postfix.zip etc/postfix)
+echo "Postfix backup created."
 
-##############################
-# Backup Postfix
-##############################
-# Assumes Postfix config is in /etc/postfix
-mkdir -p "$TMP_DIR/postfix"
-if [ -d /etc/postfix ]; then
-  cp -a /etc/postfix "$TMP_DIR/postfix/"
-else
-  echo "Warning: /etc/postfix not found."
-fi
+# Dovecot backup: zip the dovecot configuration.
+(cd / && zip -r /tmp/dovecot.zip etc/dovecot)
+echo "Dovecot backup created."
 
-##############################
-# Backup Dovecot
-##############################
-# Assumes Dovecot config is in /etc/dovecot
-mkdir -p "$TMP_DIR/dovecot"
-if [ -d /etc/dovecot ]; then
-  cp -a /etc/dovecot "$TMP_DIR/dovecot/"
-else
-  echo "Warning: /etc/dovecot not found."
-fi
+# Roundcube backup: zip the roundcube configuration and web files.
+(cd / && zip -r /tmp/roundcube.zip etc/roundcube usr/share/roundcube)
+echo "Roundcube backup created."
 
-##############################
-# Backup Roundcube
-##############################
-# Assumes Roundcube config is in /etc/roundcube and its web files in /usr/share/roundcube
-mkdir -p "$TMP_DIR/roundcube"
-if [ -d /etc/roundcubemail ]; then
-  cp -a /etc/roundcubemail "$TMP_DIR/roundcubemail/"
-else
-  echo "Warning: /etc/roundcubemail not found."
-fi
-if [ -d /usr/share/roundcubemail ]; then
-  cp -a /usr/share/roundcubemail "$TMP_DIR/roundcubemail/"
-else
-  echo "Warning: /usr/share/roundcubemail not found."
-fi
+# MariaDB backup: zip the MySQL data directory.
+(cd / && zip -r /tmp/mariadb.zip var/lib/mysql)
+echo "MariaDB backup created."
 
-##############################
-# Backup MariaDB Databases
-##############################
-echo "Backing up MariaDB databases..."
-# This command dumps all databases. If a password is required, you might need to modify the command 
-# (for example, using a .my.cnf file for credentials or appending -p and entering the password).
-mysqldump --all-databases --single-transaction --quick --lock-tables=false > "$TMP_DIR/all_databases_$TIMESTAMP.sql"
+# Copy each archive to both backup directories.
+for ARCHIVE in apache.zip postfix.zip dovecot.zip roundcube.zip mariadb.zip; do
+    cp /tmp/"$ARCHIVE" "$BACKUP_DIR1"/
+    cp /tmp/"$ARCHIVE" "$BACKUP_DIR2"/
+    echo "Copied $ARCHIVE to $BACKUP_DIR1 and $BACKUP_DIR2"
+done
 
-##############################
-# (Optional) Backup additional system configurations
-##############################
-# Uncomment the following if you wish to include the entire /etc directory:
-# cp -a /etc "$TMP_DIR/etc_full_backup"
+# Clean up temporary archives
+rm /tmp/apache.zip /tmp/postfix.zip /tmp/dovecot.zip /tmp/roundcube.zip /tmp/mariadb.zip
 
-##############################
-# Create the compressed backup archive
-##############################
-BACKUP_FILE="backup_$TIMESTAMP.tar.gz"
-tar -czvf "/tmp/$BACKUP_FILE" -C "$TMP_DIR" .
-
-##############################
-# Copy the backup archive to both destinations
-##############################
-cp "/tmp/$BACKUP_FILE" "$BACKUP_DIR1/"
-cp "/tmp/$BACKUP_FILE" "$BACKUP_DIR2/"
-
-echo "Backup completed successfully at $(date)."
-echo "Backup file: $BACKUP_FILE saved in $BACKUP_DIR1 and $BACKUP_DIR2"
-
-# Clean up temporary files
-rm -rf "$TMP_DIR"
-rm "/tmp/$BACKUP_FILE"
-
-exit 0
+echo "Backup completed successfully."
