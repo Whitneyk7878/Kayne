@@ -479,83 +479,58 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Backups                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-# Create hidden directory for compressed files
-echo "Creating hidden directory..."
-sudo mkdir /lib/.tarkov
-# Archive and store system files
-# FIRST BACKUP
-echo "Compressing and storing system files individually..."
-sudo tar -czf /lib/.tarkov/shadow_backup.tar.gz /etc/shadow
-sudo tar -czf /lib/.tarkov/passwd_backup.tar.gz /etc/passwd
-sudo tar -czf /lib/.tarkov/fail2ban_backup.tar.gz /etc/fail2ban/
-sudo tar -czf /lib/.tarkov/hosts_backup.tar.gz /etc/hosts
-sudo tar -czf /lib/.tarkov/log_backup.tar.gz /var/log
-sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
-sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
-sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
-sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
-
-#SECOND BACKUP
-# backup_mailserver.sh
+#!/bin/bash
+# Simple Backup Script
+# This script zips up the critical service directories and places the resulting
+# archives directly into /etc/ftb and /etc/.tarkov.
 #
-# A simple script to back up Postfix, Dovecot, Roundcube config, mail data, 
-# and the Roundcube MySQL database.
+# Services:
+#   - Apache: /etc/httpd and /var/www
+#   - Postfix: /etc/postfix
+#   - Dovecot: /etc/dovecot
+#   - Roundcube: /etc/roundcube and /usr/share/roundcube
+#   - MariaDB: /var/lib/mysql
+#
+# Note: This script uses the system’s 'zip' command. Ensure it is installed.
 
-# 1. Set variables
-BACKUP_DIR="/var/backups/mailserver"  # Where to store backup tarballs
-NOW=$(date +%Y%m%d_%H%M%S)           # Timestamp
-BACKUP_FILE="$BACKUP_DIR/mailserver_backup_$NOW.tar.gz"
+set -e
 
-# 2. Roundcube Database Credentials
-#DB_NAME="roundcubemail"
-#DB_USER="root"
-#DB_PASS="YOUR_DB_PASSWORD"
+# Define backup destination directories
+BACKUP_DIR1="/etc/ftb"
+BACKUP_DIR2="/etc/.tarkov"
 
-# 3. Additional directories to back up
-POSTFIX_DIR="/etc/postfix"
-DOVECOT_DIR="/etc/dovecot"
-ROUNDCUBE_CONF_DIR="/etc/roundcubemail"
-MAIL_DIR="/var/mail"                 # Adjust if your mail is elsewhere
-APACHE_CONF_DIR="/etc/httpd/conf"    # Optional
-APACHE_CONF_D_DIR="/etc/httpd/conf.d"
-#SSL_CERT_DIR="/etc/pki/tls"
+# Create backup directories if they don't already exist.
+mkdir -p "$BACKUP_DIR1" "$BACKUP_DIR2"
 
-# 4. Create backup directory if it doesn't exist
-if [ ! -d "$BACKUP_DIR" ]; then
-    mkdir -p "$BACKUP_DIR"
-fi
+echo "Starting backup..."
 
-# 5. Dump Roundcube MySQL database
-#echo "Dumping Roundcube database..."
-#mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" > /tmp/roundcube.sql
-#if [ $? -ne 0 ]; then
-#    echo "Error: mysqldump failed. Exiting."
-#    exit 1
-#fi
+# Backup Apache (configuration and web files)
+zip -r "$BACKUP_DIR1/apache.zip" /etc/httpd /var/www
+cp "$BACKUP_DIR1/apache.zip" "$BACKUP_DIR2/"
+echo "Apache backup complete."
 
-# 6. Create tarball of relevant directories + DB dump
-echo "Creating tar archive..."
-tar -czf "$BACKUP_FILE" \
-    "$POSTFIX_DIR" \
-    "$DOVECOT_DIR" \
-    "$ROUNDCUBE_CONF_DIR" \
-    "$MAIL_DIR" \
-    "$APACHE_CONF_DIR" \
-    "$APACHE_CONF_D_DIR" \
-#    "$SSL_CERT_DIR" \
-#    /tmp/roundcube.sql \
-    /etc/aliases \
-    /etc/aliases.db 2>/dev/null
+# Backup Postfix (configuration)
+zip -r "$BACKUP_DIR1/postfix.zip" /etc/postfix
+cp "$BACKUP_DIR1/postfix.zip" "$BACKUP_DIR2/"
+echo "Postfix backup complete."
 
-# 7. Remove temporary DB dump
-#rm -f /tmp/roundcube.sql
+# Backup Dovecot (configuration)
+zip -r "$BACKUP_DIR1/dovecot.zip" /etc/dovecot
+cp "$BACKUP_DIR1/dovecot.zip" "$BACKUP_DIR2/"
+echo "Dovecot backup complete."
 
-# 8. Confirm backup is complete
-if [ -f "$BACKUP_FILE" ]; then
-    echo "Backup successful: $BACKUP_FILE"
-else
-    echo "Backup failed!"
-fi
+# Backup Roundcube (configuration and web files)
+zip -r "$BACKUP_DIR1/roundcube.zip" /etc/roundcube /usr/share/roundcube
+cp "$BACKUP_DIR1/roundcube.zip" "$BACKUP_DIR2/"
+echo "Roundcube backup complete."
+
+# Backup MariaDB (data directory)
+zip -r "$BACKUP_DIR1/mariadb.zip" /var/lib/mysql
+cp "$BACKUP_DIR1/mariadb.zip" "$BACKUP_DIR2/"
+echo "MariaDB backup complete."
+
+echo "All backups completed successfully."
+
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
