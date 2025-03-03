@@ -477,6 +477,7 @@ echo "Setting up audit rules..."
 sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/CustomAudit.rules
 sudo rm /etc/audit/rules.d/audit.rules
 sudo mv CustomAudit.rules /etc/audit/rules.d/
+sudo dos2unix /etc/audit/rules.d/CustomAudit.rules
 sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
