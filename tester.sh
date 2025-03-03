@@ -64,13 +64,13 @@ fi
 ##############################
 # Assumes Roundcube config is in /etc/roundcube and its web files in /usr/share/roundcube
 mkdir -p "$TMP_DIR/roundcube"
-if [ -d /etc/roundcube ]; then
-  cp -a /etc/roundcube "$TMP_DIR/roundcubemail/"
+if [ -d /etc/roundcubemail ]; then
+  cp -a /etc/roundcubemail "$TMP_DIR/roundcubemail/"
 else
   echo "Warning: /etc/roundcubemail not found."
 fi
-if [ -d /usr/share/roundcube ]; then
-  cp -a /usr/share/roundcube "$TMP_DIR/roundcubemail/"
+if [ -d /usr/share/roundcubemail ]; then
+  cp -a /usr/share/roundcubemail "$TMP_DIR/roundcubemail/"
 else
   echo "Warning: /usr/share/roundcubemail not found."
 fi
