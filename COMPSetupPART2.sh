@@ -398,7 +398,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Install fail2ban
 echo "Installing fail2ban..."
-yum install -y -q fail2ban
+sudo yum install -y -q fail2ban
 # Create fail2ban log file
 echo "Creating fail2ban log file..."
 sudo touch /var/log/fail2ban.log
