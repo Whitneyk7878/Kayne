@@ -1,13 +1,16 @@
 #!/bin/bash
-# Simple Backup Script for Fedora 21 Services
-# This script zips up service directories and copies the archives
-# to two backup locations: /etc/ftb and /etc/.tarkov.
+# Simple Backup Script
+# This script zips up the critical service directories and places the resulting
+# archives directly into /etc/ftb and /etc/.tarkov.
+#
 # Services:
 #   - Apache: /etc/httpd and /var/www
 #   - Postfix: /etc/postfix
 #   - Dovecot: /etc/dovecot
 #   - Roundcube: /etc/roundcube and /usr/share/roundcube
 #   - MariaDB: /var/lib/mysql
+#
+# Note: This script uses the system’s 'zip' command. Ensure it is installed.
 
 set -e
 
@@ -15,39 +18,34 @@ set -e
 BACKUP_DIR1="/etc/ftb"
 BACKUP_DIR2="/etc/.tarkov"
 
-# Create backup directories if they don't exist
+# Create backup directories if they don't already exist.
 mkdir -p "$BACKUP_DIR1" "$BACKUP_DIR2"
 
-echo "Creating backup archives..."
+echo "Starting backup..."
 
-# Apache backup: zip the Apache configuration and web files.
-(cd / && zip -r /tmp/apache.zip etc/httpd var/www)
-echo "Apache backup created."
+# Backup Apache (configuration and web files)
+zip -r "$BACKUP_DIR1/apache.zip" /etc/httpd /var/www
+cp "$BACKUP_DIR1/apache.zip" "$BACKUP_DIR2/"
+echo "Apache backup complete."
 
-# Postfix backup: zip the postfix configuration.
-(cd / && zip -r /tmp/postfix.zip etc/postfix)
-echo "Postfix backup created."
+# Backup Postfix (configuration)
+zip -r "$BACKUP_DIR1/postfix.zip" /etc/postfix
+cp "$BACKUP_DIR1/postfix.zip" "$BACKUP_DIR2/"
+echo "Postfix backup complete."
 
-# Dovecot backup: zip the dovecot configuration.
-(cd / && zip -r /tmp/dovecot.zip etc/dovecot)
-echo "Dovecot backup created."
+# Backup Dovecot (configuration)
+zip -r "$BACKUP_DIR1/dovecot.zip" /etc/dovecot
+cp "$BACKUP_DIR1/dovecot.zip" "$BACKUP_DIR2/"
+echo "Dovecot backup complete."
 
-# Roundcube backup: zip the roundcube configuration and web files.
-(cd / && zip -r /tmp/roundcube.zip etc/roundcube usr/share/roundcube)
-echo "Roundcube backup created."
+# Backup Roundcube (configuration and web files)
+zip -r "$BACKUP_DIR1/roundcube.zip" /etc/roundcube /usr/share/roundcube
+cp "$BACKUP_DIR1/roundcube.zip" "$BACKUP_DIR2/"
+echo "Roundcube backup complete."
 
-# MariaDB backup: zip the MySQL data directory.
-(cd / && zip -r /tmp/mariadb.zip var/lib/mysql)
-echo "MariaDB backup created."
+# Backup MariaDB (data directory)
+zip -r "$BACKUP_DIR1/mariadb.zip" /var/lib/mysql
+cp "$BACKUP_DIR1/mariadb.zip" "$BACKUP_DIR2/"
+echo "MariaDB backup complete."
 
-# Copy each archive to both backup directories.
-for ARCHIVE in apache.zip postfix.zip dovecot.zip roundcube.zip mariadb.zip; do
-    cp /tmp/"$ARCHIVE" "$BACKUP_DIR1"/
-    cp /tmp/"$ARCHIVE" "$BACKUP_DIR2"/
-    echo "Copied $ARCHIVE to $BACKUP_DIR1 and $BACKUP_DIR2"
-done
-
-# Clean up temporary archives
-rm /tmp/apache.zip /tmp/postfix.zip /tmp/dovecot.zip /tmp/roundcube.zip /tmp/mariadb.zip
-
-echo "Backup completed successfully."
+echo "All backups completed successfully."
