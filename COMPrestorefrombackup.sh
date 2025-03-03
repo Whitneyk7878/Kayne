@@ -14,7 +14,7 @@ echo "Select the service to restore:"
 echo "a) Apache"
 echo "b) Postfix"
 echo "c) Dovecot"
-echo "d) Roundcube"
+echo "d) Roundcubemail"
 echo "e) MariaDB"
 read -p "Enter your choice (a-e): " service_choice
 
@@ -29,7 +29,7 @@ case "$service_choice" in
     SERVICE="dovecot"
     ;;
   d|D)
-    SERVICE="roundcube"
+    SERVICE="roundcubemail"
     ;;
   e|E)
     SERVICE="mariadb"
