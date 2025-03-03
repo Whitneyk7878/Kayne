@@ -479,6 +479,8 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Backups                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
+
+
 #!/bin/bash
 # Simple Backup Script
 # This script zips up the critical service directories and places the resulting
@@ -488,7 +490,7 @@ sleep 1
 #   - Apache: /etc/httpd and /var/www
 #   - Postfix: /etc/postfix
 #   - Dovecot: /etc/dovecot
-#   - Roundcube: /etc/roundcube and /usr/share/roundcube
+#   - Roundcube: /etc/roundcubemail and /usr/share/roundcubemail
 #   - MariaDB: /var/lib/mysql
 #
 # Note: This script uses the system’s 'zip' command. Ensure it is installed.
@@ -520,9 +522,9 @@ cp "$BACKUP_DIR1/dovecot.zip" "$BACKUP_DIR2/"
 echo "Dovecot backup complete."
 
 # Backup Roundcube (configuration and web files)
-zip -r "$BACKUP_DIR1/roundcube.zip" /etc/roundcube /usr/share/roundcube
-cp "$BACKUP_DIR1/roundcube.zip" "$BACKUP_DIR2/"
-echo "Roundcube backup complete."
+zip -r "$BACKUP_DIR1/roundcubemail.zip" /etc/roundcubemail /usr/share/roundcubemail
+cp "$BACKUP_DIR1/roundcubemail.zip" "$BACKUP_DIR2/"
+echo "Roundcubemail backup complete."
 
 # Backup MariaDB (data directory)
 zip -r "$BACKUP_DIR1/mariadb.zip" /var/lib/mysql
