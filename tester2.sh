@@ -1,77 +1,58 @@
 #!/bin/bash
-# Interactive Restore Script
-# This script lets you choose which service to restore (Apache, Postfix,
-# Dovecot, Roundcube, or MariaDB) and from which backup location (/etc/ftb
-# or /etc/.tarkov). It then unzips the corresponding archive back into /.
-#
-# WARNING: Restoring will overwrite existing files in the target directories.
-# Ensure you have current backups before proceeding.
+# Diffing Baselines Script
 
-set -e
+# Define directories
+BASE_DIR="/root/DIFFING"
+CHANGES_DIR="${BASE_DIR}/CHANGES"
+#mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
-# Prompt for service to restore
-echo "Select the service to restore:"
-echo "a) Apache"
-echo "b) Postfix"
-echo "c) Dovecot"
-echo "d) Roundcube"
-echo "e) MariaDB"
-read -p "Enter your choice (a-e): " service_choice
+# ANSI color codes
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-case "$service_choice" in
-  a|A)
-    SERVICE="apache"
-    ;;
-  b|B)
-    SERVICE="postfix"
-    ;;
-  c|C)
-    SERVICE="dovecot"
-    ;;
-  d|D)
-    SERVICE="roundcube"
-    ;;
-  e|E)
-    SERVICE="mariadb"
-    ;;
-  *)
-    echo "Invalid selection. Exiting."
-    exit 1
-    ;;
-esac
+# Declare an associative array of commands.
+# Keys are short names; values are the commands to run.
+declare -A commands
+commands[aureport]="aureport -i"
+commands[services]="sudo systemctl list-units --type=service --state=active"
+commands[port]="sudo lsof -i -n | grep 'LISTEN'"
+commands[connection]="sudo ss -t state established"
+commands[alias]="sudo cat /root/.bashrc"
+commands[executables]="sudo find / -type f -executable 2>/dev/null"
+commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
+commands[users]="sudo cat /etc/shadow"
+commands[rootkit]="sudo chkrootkit"
+commands[iptables]="sudo iptables -L -n -v"
+commands[free]="free -h"
 
-# Prompt for backup location
-echo "Select the backup location to restore from:"
-echo "1) /etc/ftb"
-echo "2) /etc/.tarkov"
-read -p "Enter your choice (1 or 2): " loc_choice
+# Loop over each command, capturing and diffing the outputs.
+for key in "${!commands[@]}"; do
+    echo "Processing ${key} baseline..."
+    current_file="${BASE_DIR}/${key}_current.txt"
+    previous_file="${BASE_DIR}/${key}_previous.txt"
+    diff_file="${CHANGES_DIR}/${key}_diff.txt"
 
-case "$loc_choice" in
-  1)
-    BACKUP_DIR="/etc/ftb"
-    ;;
-  2)
-    BACKUP_DIR="/etc/.tarkov"
-    ;;
-  *)
-    echo "Invalid selection. Exiting."
-    exit 1
-    ;;
-esac
+    # If a current baseline exists, move it to previous.
+    if [ -f "$current_file" ]; then
+        mv "$current_file" "$previous_file"
+    fi
 
-# Define the backup file
-BACKUP_FILE="${BACKUP_DIR}/${SERVICE}.zip"
-if [ ! -f "$BACKUP_FILE" ]; then
-  echo "Backup file $BACKUP_FILE not found! Exiting."
-  exit 1
-fi
+    # Run the command and save its output as the new current baseline.
+    eval ${commands[$key]} > "$current_file"
 
-echo "Restoring $SERVICE from $BACKUP_FILE..."
+    # If a previous baseline exists, perform a unified diff.
+    if [ -f "$previous_file" ]; then
+        diff -u "$previous_file" "$current_file" > "$diff_file"
+        if [ -s "$diff_file" ]; then
+            echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
+        else
+            echo -e "${GREEN}No differences found for ${key}.${NC}"
+            rm -f "$diff_file"
+        fi
+    else
+        echo "No previous baseline for ${key}. Baseline saved as current."
+    fi
+done
 
-# Change directory to / so that relative paths in the zip are restored correctly.
-cd /
-
-# Unzip the backup archive. The -o flag overwrites existing files.
-unzip -o "$BACKUP_FILE"
-
-echo "$SERVICE restoration completed successfully."
+echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
