@@ -7,14 +7,12 @@ CHANGES_DIR="${BASE_DIR}/CHANGES"
 # UNCOMMENT THIS IF YOU DONT MAKE THEM IN AN INIT SCRIPT LIKE ME
 #mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
-# ANSI color codes
 # Colors because they make me happy
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Declare an associative array of commands.
-# Keys are short names; values are the commands to run.
 declare -A commands
 commands[aureport]="aureport -i"
 commands[services]="sudo systemctl list-units --type=service --state=active"
