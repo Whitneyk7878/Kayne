@@ -4,9 +4,15 @@
 # Define directories
 BASE_DIR="/root/DIFFING"
 CHANGES_DIR="${BASE_DIR}/CHANGES"
-mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+#mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+
+# ANSI color codes
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
 # Declare an associative array of commands.
+# Keys are short names; values are the commands to run.
 declare -A commands
 commands[aureport]="aureport -i"
 commands[services]="sudo systemctl list-units --type=service --state=active"
@@ -39,9 +45,9 @@ for key in "${!commands[@]}"; do
     if [ -f "$previous_file" ]; then
         diff -u "$previous_file" "$current_file" > "$diff_file"
         if [ -s "$diff_file" ]; then
-            echo "Differences found for ${key} (see ${diff_file})."
+            echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
         else
-            echo "No differences found for ${key}."
+            echo -e "${GREEN}No differences found for ${key}.${NC}"
             rm -f "$diff_file"
         fi
     else
