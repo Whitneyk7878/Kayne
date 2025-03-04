@@ -1,63 +1,56 @@
 #!/bin/bash
+# Diffing Baselines Script
+# This script captures baseline snapshots of system service info and configuration,
+# then diffs the new output against the previous baseline.
+# Baseline files are stored in /root/DIFF as <name>_current.txt and <name>_previous.txt.
+# Differences (if any) are stored in /root/DIFF/CHANGES/<name>_diff.txt.
 
-# Define Paths
-BRO_DIR="/opt/bro"
-BRO_SITE="$BRO_DIR/share/bro/site"
-RULES_DIR="$BRO_SITE/rules"
-SIGNATURES_DIR="$BRO_SITE/signatures"
-ET_RULES_URL="https://rules.emergingthreats.net/open/suricata-5.0/emerging.rules.tar.gz"
-SNORT2BRO_DIR="/usr/local/src/snort2bro"
+# Define directories
+BASE_DIR="/root/DIFF"
+CHANGES_DIR="${BASE_DIR}/CHANGES"
+mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
-# Ensure Bro is Installed
-if [ ! -d "$BRO_DIR" ]; then
-    echo "Error: Bro (Zeek) is not installed in $BRO_DIR. Exiting..."
-    exit 1
-fi
+# Declare an associative array of commands.
+# Keys are short names; values are the commands to run.
+declare -A commands
+commands[aureport]="aureport -i"
+commands[services]="sudo systemctl list-units --type=service --state=active"
+commands[port]="sudo lsof -i -n | grep 'LISTEN'"
+commands[connection]="sudo ss -t state established"
+commands[alias]="sudo cat /root/.bashrc"
+commands[executables]="sudo find / -type f -executable 2>/dev/null"
+commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
+commands[users]="sudo cat /etc/shadow"
+commands[rootkit]="sudo chkrootkit"
 
-# Ensure Snort2Bro is Installed
-if [ ! -d "$SNORT2BRO_DIR" ]; then
-    echo "Installing Snort2Bro..."
-    cd /usr/local/src
-    git clone https://github.com/J-Gras/snort2bro.git
-    cd snort2bro
-    chmod +x snort2bro.pl
-fi
+# Loop over each command, capturing and diffing the outputs.
+for key in "${!commands[@]}"; do
+    echo "Processing ${key} baseline..."
+    current_file="${BASE_DIR}/${key}_current.txt"
+    previous_file="${BASE_DIR}/${key}_previous.txt"
+    diff_file="${CHANGES_DIR}/${key}_diff.txt"
 
-# Create Required Directories
-mkdir -p "$RULES_DIR"
-mkdir -p "$SIGNATURES_DIR"
+    # If a current baseline exists, move it to previous.
+    if [ -f "$current_file" ]; then
+        mv "$current_file" "$previous_file"
+    fi
 
-# Download Emerging Threats Rules
-echo "[+] Downloading Emerging Threats rules..."
-cd "$RULES_DIR"
-wget -q -O emerging.rules.tar.gz "$ET_RULES_URL"
+    # Run the command and save its output as the new current baseline.
+    # Using eval so that any shell constructs (like the for loop in cron) work properly.
+    eval ${commands[$key]} > "$current_file"
 
-# Extract Rules
-echo "[+] Extracting rules..."
-tar -xzf emerging.rules.tar.gz
-cat emerging-*.rules > emerging-threats.rules
+    # If a previous baseline exists, perform a unified diff.
+    if [ -f "$previous_file" ]; then
+        diff -u "$previous_file" "$current_file" > "$diff_file"
+        if [ -s "$diff_file" ]; then
+            echo "Differences found for ${key} (see ${diff_file})."
+        else
+            echo "No differences found for ${key}."
+            rm -f "$diff_file"
+        fi
+    else
+        echo "No previous baseline for ${key}. Baseline saved as current."
+    fi
+done
 
-# Convert Snort/Suricata Rules to Bro Format
-echo "[+] Converting rules using Snort2Bro..."
-perl "$SNORT2BRO_DIR/snort2bro.pl" -i emerging-threats.rules -o emerging-threats.sig
-
-# Move Converted Rules to Bro Signatures Directory
-echo "[+] Updating Bro signatures..."
-mv emerging-threats.sig "$SIGNATURES_DIR/emerging-threats.sig"
-
-# Configure Bro to Load the Rules (if not already configured)
-if ! grep -q "emerging-threats.sig" "$BRO_SITE/local.bro"; then
-    echo "[+] Configuring Bro to load Emerging Threats rules..."
-    echo '@load signatures' >> "$BRO_SITE/local.bro"
-    echo 'signature_files += "signatures/emerging-threats.sig";' >> "$BRO_SITE/local.bro"
-fi
-
-# Restart Bro (Zeek) to Apply Changes
-echo "[+] Restarting Bro..."
-$BRO_DIR/bin/broctl deploy
-
-# Cleanup
-rm -f emerging.rules.tar.gz
-
-echo "[+] Emerging Threats rules updated successfully!"
-exit 0
+echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
