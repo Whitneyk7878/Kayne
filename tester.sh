@@ -6,7 +6,7 @@
 # Differences (if any) are stored in /root/DIFF/CHANGES/<name>_diff.txt.
 
 # Define directories
-BASE_DIR="/root/DIFF"
+BASE_DIR="/root/DIFFING"
 CHANGES_DIR="${BASE_DIR}/CHANGES"
 mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
