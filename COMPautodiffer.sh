@@ -8,6 +8,7 @@ CHANGES_DIR="${BASE_DIR}/CHANGES"
 #mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
 # ANSI color codes
+# Colors because they make me happy
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
