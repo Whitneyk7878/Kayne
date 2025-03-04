@@ -4,6 +4,7 @@
 # Define directories
 BASE_DIR="/root/DIFFING"
 CHANGES_DIR="${BASE_DIR}/CHANGES"
+# UNCOMMENT THIS IF YOU DONT MAKE THEM IN AN INIT SCRIPT LIKE ME
 #mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
 
 # ANSI color codes
