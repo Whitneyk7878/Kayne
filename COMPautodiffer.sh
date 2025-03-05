@@ -25,6 +25,8 @@ commands[users]="sudo cat /etc/shadow"
 commands[rootkit]="sudo chkrootkit"
 commands[iptables]="sudo iptables -L -n -v"
 commands[free]="free -h"
+commands[processes]="ps -eo comm | sort"
+commands[yum_installed]="yum list installed"
 
 # Loop over each command, capturing and diffing the outputs.
 for key in "${!commands[@]}"; do
@@ -53,6 +55,7 @@ for key in "${!commands[@]}"; do
     else
         echo "No previous baseline for ${key}. Baseline saved as current."
     fi
+
 done
 
 echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
