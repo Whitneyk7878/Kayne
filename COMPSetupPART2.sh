@@ -106,6 +106,7 @@ files=(
     "COMPBackupFIREWALL.sh"
     "COMPcreatebackups.sh"
     "COMPrestorefrombackup.sh"
+    "COMPautodiffer.sh"
 )
 
 # Loop over each file and download it into the COMPtools directory
