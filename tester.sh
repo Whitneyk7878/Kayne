@@ -1,17 +1,18 @@
 #!/bin/bash
 # Diffing Baselines Script
-# This script captures baseline snapshots of system service info and configuration,
-# then diffs the new output against the previous baseline.
-# Baseline files are stored in /root/DIFF as <name>_current.txt and <name>_previous.txt.
-# Differences (if any) are stored in /root/DIFF/CHANGES/<name>_diff.txt.
 
 # Define directories
 BASE_DIR="/root/DIFFING"
 CHANGES_DIR="${BASE_DIR}/CHANGES"
-mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+# UNCOMMENT THIS IF YOU DONT MAKE THEM IN AN INIT SCRIPT LIKE ME
+#mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+
+# Colors because they make me happy
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
 # Declare an associative array of commands.
-# Keys are short names; values are the commands to run.
 declare -A commands
 commands[aureport]="aureport -i"
 commands[services]="sudo systemctl list-units --type=service --state=active"
@@ -22,6 +23,10 @@ commands[executables]="sudo find / -type f -executable 2>/dev/null"
 commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
 commands[users]="sudo cat /etc/shadow"
 commands[rootkit]="sudo chkrootkit"
+commands[iptables]="sudo iptables -L -n -v"
+commands[free]="free -h"
+commands[processes]="ps -eo comm | sort"
+commands[yum_installed]="yum list installed"
 
 # Loop over each command, capturing and diffing the outputs.
 for key in "${!commands[@]}"; do
@@ -36,21 +41,21 @@ for key in "${!commands[@]}"; do
     fi
 
     # Run the command and save its output as the new current baseline.
-    # Using eval so that any shell constructs (like the for loop in cron) work properly.
     eval ${commands[$key]} > "$current_file"
 
     # If a previous baseline exists, perform a unified diff.
     if [ -f "$previous_file" ]; then
         diff -u "$previous_file" "$current_file" > "$diff_file"
         if [ -s "$diff_file" ]; then
-            echo "Differences found for ${key} (see ${diff_file})."
+            echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
         else
-            echo "No differences found for ${key}."
+            echo -e "${GREEN}No differences found for ${key}.${NC}"
             rm -f "$diff_file"
         fi
     else
         echo "No previous baseline for ${key}. Baseline saved as current."
     fi
+
 done
 
 echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
