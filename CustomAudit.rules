@@ -977,6 +977,7 @@
 
 # Monitor port knocking attempts
 -w /etc/knockd.conf -p wa -k TA0011_T1205_port_knocking
+-w /etc/default/knockd.conf -p wa -k TA0011_T1205_port_knocking
 
 #///////////////////////////////////////////////////
 # T1102 - Web Service
