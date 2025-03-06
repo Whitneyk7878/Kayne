@@ -28,6 +28,7 @@ commands[iptables]="iptables-save | sed -E 's/\[.*?\]//g' | sed '/^#/d' | sort"
 commands[free]="free -h"
 commands[processes]="ps aux --sort=user,pid"
 commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
+commands[etc_config]="find /etc -type f -exec sha256sum {} + | sort"
 
 # Loop over each command, capturing and diffing the outputs.
 for key in "${!commands[@]}"; do
@@ -43,7 +44,6 @@ for key in "${!commands[@]}"; do
 
     # Run the command and save its output as the new current baseline.
     eval ${commands[$key]} > "$current_file"
-
 
     # If a previous baseline exists, perform a unified diff.
     if [ -f "$previous_file" ]; then
