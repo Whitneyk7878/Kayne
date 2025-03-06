@@ -48,7 +48,7 @@ for key in "${!commands[@]}"; do
     if [ -f "$previous_file" ]; then
         diff -u "$previous_file" "$current_file" > "$diff_file"
         if [ -s "$diff_file" ]; then
-            if [[ "$key" == "aureport" || "$key" == "connection" || "$key" == "yum_installed" || "$key" == "processes" ]]; then
+            if [[ "$key" == "aureport" || "$key" == "connection" || "$key" == "yum_installed" || "$key" == "processes" || "$key" == "free" ]]; then
                 echo -e "${YELLOW}Differences found for ${key} (see ${diff_file}).${NC}"
             else
                 echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
