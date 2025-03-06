@@ -28,6 +28,7 @@ commands[iptables]="iptables-save | sed -E 's/\[.*?\]//g' | sed '/^#/d' | sort"
 commands[free]="free -h"
 commands[processes]="ps aux --sort=user,pid"
 commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
+commands[etc_config]="find /etc -type f -exec sha256sum {} + | sort"
 
 # Loop over each command, capturing and diffing the outputs.
 for key in "${!commands[@]}"; do
