@@ -15,18 +15,18 @@ NC='\033[0m' # No Color
 # Declare an associative array of commands.
 declare -A commands
 commands[aureport]="aureport -i"
-commands[services]="sudo systemctl list-units --type=service --state=active"
-commands[port]="sudo lsof -i -n | grep 'LISTEN'"
-commands[connection]="sudo ss -t state established"
-commands[alias]="sudo cat /root/.bashrc"
-commands[executables]="sudo find / -type f -executable 2>/dev/null"
+commands[services]="systemctl list-units --type=service --all --no-pager --no-legend | awk '{print $1, $4, $5}' | sort"
+commands[port]="ss -tulnp | sort"
+commands[connection]="ss -tanp | sort"
+commands[alias]="alias | sort"
+commands[executables]="find /usr/bin /usr/sbin /bin /sbin -type f | sort"
 commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
 commands[users]="sudo cat /etc/shadow"
 commands[rootkit]="sudo chkrootkit"
-commands[iptables]="sudo iptables -L -n -v"
+commands[iptables]="iptables-save | sort"
 commands[free]="free -h"
-commands[processes]="ps -eo comm | sort"
-commands[yum_installed]="yum list installed"
+commands[processes]="ps aux --sort=user,pid"
+commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
 
 # Loop over each command, capturing and diffing the outputs.
 for key in "${!commands[@]}"; do
