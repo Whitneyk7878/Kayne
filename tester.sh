@@ -23,7 +23,7 @@ commands[executables]="find /usr/bin /usr/sbin /bin /sbin -type f | sort"
 commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
 commands[users]="sudo cat /etc/shadow"
 commands[rootkit]="sudo chkrootkit"
-commands[iptables]="iptables-save | sort"
+commands[iptables]="iptables-save | sed -E 's/\[.*?\]//g' | sed '/^#/d' | sort"
 commands[free]="free -h"
 commands[processes]="ps aux --sort=user,pid"
 commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
