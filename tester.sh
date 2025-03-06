@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Declare an associative array of commands.
 declare -A commands
 commands[aureport]="aureport -i"
-commands[services]="systemctl list-units --type=service --all --no-pager --no-legend | awk '{print $1, $4, $5}' | sort"
+commands[services]="systemctl list-units --type=service --all --no-pager --no-legend | cut -d ' ' -f1 | sort"
 commands[port]="ss -tulnp | sort"
 commands[connection]="ss -tanp | sort"
 commands[alias]="alias | sort"
