@@ -331,6 +331,9 @@
 -w /etc/environment -p wa -k TA0003_T1574_HijackExecutionFlow
 -w /etc/ld.so.conf -p wa -k TA0003_T1574_HijackExecutionFlow
 # -a always,exit -F env=LD_PRELOAD -F key=TA0003_T1574_HijackExecutionFlow
+-a always,exit -F arch=b64 -S execve -F env=LD_PRELOAD -k TA0003_T1574_HijackExecutionFlow
+-a always,exit -F arch=b64 -S openat -F dir=/lib64 -F perm=x -k TA0003_T1574_HijackExecutionFlow
+
 
 #///////////////////////////////////////////////////
 # T1525 - Implant Internal Image
@@ -507,6 +510,7 @@
 
 # Monitor trap command usage
 -a always,exit -F arch=b64 -S execve -F path=/usr/bin/trap -F key=TA0004_T1546_trap
+-a always,exit -F arch=b64 -S trap -k key=TA0004_T1546_trap
 
 # Monitor modifications to udev rules
 -w /etc/udev/rules.d/ -p wa -k TA0004_T1546_udev
