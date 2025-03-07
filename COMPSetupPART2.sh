@@ -488,8 +488,8 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Configure ClamAV
 echo "Configuring ClamAV..."
-sudo sed -i '8s/^/#/' /etc/freshclam.conf
-sudo freshclam
+#sudo sed -i '8s/^/#/' /etc/freshclam.conf
+#sudo freshclam
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -563,17 +563,10 @@ sleep 1
 echo "Creating DIFFING directory..."
 sudo mkdir DIFFING
 # Generate baseline system information
-echo "Generating baseline data..."
-sudo lsof -i -n | grep "LISTEN" > DIFFING/portdiffingBASELINE.txt
-sudo ss -t state established > DIFFING/connectiondiffingBASELINE.txt
-sudo cat /root/.bashrc > DIFFING/alias_diffingBASELINE.txt
-sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELINE.txt
-for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
-sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
+echo "Running auto-differ.."
+sudo bash /root/COMPtools/COMPautodiffer.sh
 
 
-#Running auditctl rules again because it doesnt like it the first time
-sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
 #echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -634,7 +627,7 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Install XFCE                        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-sudo yum groupinstall "XFCE" "X Window System" -y -q
+sudo yum groupinstall "Xfce Desktop" -y -q
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
@@ -735,13 +728,13 @@ for dir in "${CONFIG_DIRS[@]}"; do
 done
 
 
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-echo "Initializing AIDE database (this may take a while).."
-sudo aide --init
-sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+#echo "Initializing AIDE database (this may take a while).."
+#sudo aide --init
+#sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 echo " "
 echo -e "\e[45mSCRIPT HAS FINISHED RUNNING... REBOOTING..\e[0m"
 sleep 3
