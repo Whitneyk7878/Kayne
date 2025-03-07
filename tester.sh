@@ -1,66 +1,85 @@
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m                     Backups                         \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
+
 #!/bin/bash
-# Diffing Baselines Script
+# Simple Backup Script
+# This script zips up the critical service directories and places the resulting
+# archives directly into /etc/ftb and /etc/.tarkov.
+#
+# Services:
+#   - Apache: /etc/httpd and /var/www
+#   - Postfix: /etc/postfix
+#   - Dovecot: /etc/dovecot
+#   - Roundcube: /etc/roundcubemail and /usr/share/roundcubemail
+#   - MariaDB: /var/lib/mysql
+#   - Network configurations: /etc/sysconfig/network and /etc/sysconfig/network-scripts
+#   - User and authentication data: /etc/passwd, /etc/shadow, /etc/group, /etc/gshadow
+#   - Custom tools: /root/COMPtools
+#   - PHP configuration: /etc/php.ini and /etc/php.d
+#
+# Note: This script uses the system’s 'zip' command. Ensure it is installed.
 
-# Define directories
-BASE_DIR="/root/DIFFING"
-CHANGES_DIR="${BASE_DIR}/CHANGES"
-# UNCOMMENT THIS IF YOU DON'T MAKE THEM IN AN INIT SCRIPT LIKE ME
-# mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+set -e
 
-# Colors because they make me happy
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
+# Define backup destination directories
+BACKUP_DIR1="/etc/ftb"
+BACKUP_DIR2="/etc/.tarkov"
 
-# Declare an associative array of commands.
-declare -A commands
-commands[aureport]="aureport -i"
-commands[services]="systemctl list-units --type=service --all --no-pager --no-legend | cut -d ' ' -f1 | sort"
-commands[port]="ss -tulnp | sort"
-commands[connection]="ss -tanp | tail -n +2 | sort"
-commands[alias]="alias | sort"
-commands[executables]="find /usr/bin /usr/sbin /bin /sbin -type f | sort"
-commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
-commands[users]="sudo cat /etc/shadow"
-commands[rootkit]="sudo chkrootkit"
-commands[iptables]="iptables-save | sed -E 's/\[.*?\]//g' | sed '/^#/d' | sort"
-commands[free]="free -h"
-commands[processes]="ps aux --sort=user,pid"
-commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
-commands[etc_config]="find /etc -type f -exec sha256sum {} + | sort"
+# Create backup directories if they don't already exist.
+mkdir -p "$BACKUP_DIR1" "$BACKUP_DIR2"
 
-# Loop over each command, capturing and diffing the outputs.
-for key in "${!commands[@]}"; do
-    echo "Processing ${key} baseline..."
-    current_file="${BASE_DIR}/${key}_current.txt"
-    previous_file="${BASE_DIR}/${key}_previous.txt"
-    diff_file="${CHANGES_DIR}/${key}_diff.txt"
+echo "Starting backup..."
 
-    # If a current baseline exists, move it to previous.
-    if [ -f "$current_file" ]; then
-        mv "$current_file" "$previous_file"
-    fi
+# Backup Apache (configuration and web files)
+zip -r "$BACKUP_DIR1/apache.zip" /etc/httpd /var/www
+cp "$BACKUP_DIR1/apache.zip" "$BACKUP_DIR2/"
+echo "Apache backup complete."
 
-    # Run the command and save its output as the new current baseline.
-    eval ${commands[$key]} > "$current_file"
+# Backup Postfix (configuration)
+zip -r "$BACKUP_DIR1/postfix.zip" /etc/postfix
+cp "$BACKUP_DIR1/postfix.zip" "$BACKUP_DIR2/"
+echo "Postfix backup complete."
 
-    # If a previous baseline exists, perform a unified diff.
-    if [ -f "$previous_file" ]; then
-        diff -u "$previous_file" "$current_file" > "$diff_file"
-        if [ -s "$diff_file" ]; then
-            if [[ "$key" == "aureport" || "$key" == "connection" || "$key" == "yum_installed" || "$key" == "processes" || "$key" == "free" ]]; then
-                echo -e "${YELLOW}Differences found for ${key} (see ${diff_file}).${NC}"
-            else
-                echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
-            fi
-        else
-            echo -e "${GREEN}No differences found for ${key}.${NC}"
-            rm -f "$diff_file"
-        fi
-    else
-        echo "No previous baseline for ${key}. Baseline saved as current."
-    fi
-done
+# Backup Dovecot (configuration)
+zip -r "$BACKUP_DIR1/dovecot.zip" /etc/dovecot
+cp "$BACKUP_DIR1/dovecot.zip" "$BACKUP_DIR2/"
+echo "Dovecot backup complete."
 
-echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
+# Backup Roundcube (configuration and web files)
+zip -r "$BACKUP_DIR1/roundcubemail.zip" /etc/roundcubemail /usr/share/roundcubemail
+cp "$BACKUP_DIR1/roundcubemail.zip" "$BACKUP_DIR2/"
+echo "Roundcubemail backup complete."
+
+# Backup MariaDB (data directory)
+zip -r "$BACKUP_DIR1/mariadb.zip" /var/lib/mysql
+cp "$BACKUP_DIR1/mariadb.zip" "$BACKUP_DIR2/"
+echo "MariaDB backup complete."
+
+# Backup network configurations
+zip -r "$BACKUP_DIR1/network_configs.zip" /etc/sysconfig/network /etc/sysconfig/network-scripts
+cp "$BACKUP_DIR1/network_configs.zip" "$BACKUP_DIR2/"
+echo "Network configurations backup complete."
+
+# Backup user and authentication data
+zip -r "$BACKUP_DIR1/auth_data.zip" /etc/passwd /etc/shadow /etc/group /etc/gshadow
+cp "$BACKUP_DIR1/auth_data.zip" "$BACKUP_DIR2/"
+echo "User and authentication data backup complete."
+
+# Backup /root/COMPtools directory
+zip -r "$BACKUP_DIR1/COMPtools.zip" /root/COMPtools
+cp "$BACKUP_DIR1/COMPtools.zip" "$BACKUP_DIR2/"
+echo "/root/COMPtools backup complete."
+
+# Backup PHP configuration file
+zip -r "$BACKUP_DIR1/php_ini.zip" /etc/php.ini
+cp "$BACKUP_DIR1/php_ini.zip" "$BACKUP_DIR2/"
+echo "/etc/php.ini backup complete."
+
+# Backup PHP configuration directory
+zip -r "$BACKUP_DIR1/phpd.zip" /etc/php.d
+cp "$BACKUP_DIR1/phpd.zip" "$BACKUP_DIR2/"
+echo "/etc/php.d backup complete."
+
+echo "All backups completed successfully."
