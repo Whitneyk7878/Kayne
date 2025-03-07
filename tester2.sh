@@ -1,108 +1,74 @@
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m      Select Critical Files to Unlock (Remove Immutable)      \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
+
 #!/bin/bash
-# Interactive Restore Script
-# This script lets you choose which backup to restore from the following options:
-#   - Apache (configuration and web files)
-#   - Postfix (configuration)
-#   - Dovecot (configuration)
-#   - Roundcubemail (configuration and web files)
-#   - MariaDB (data directory)
-#   - Network configurations (network settings)
-#   - User and authentication data (e.g. /etc/passwd, /etc/shadow, etc.)
-#   - /root/COMPtools (custom tools)
-#   - PHP configuration file (/etc/php.ini)
-#   - PHP configuration directory (/etc/php.d)
-#
-# It then restores the selected archive from one of the two backup locations
-# (/etc/ftb or /etc/.tarkov) into the root directory (/).
-#
-# WARNING: Restoring will overwrite existing files in the target directories.
-# Ensure you have current backups before proceeding.
+# Interactive script to remove the immutable attribute from selected critical files and directories.
+# Run this script as root.
+# You can enter "all" to select every item or provide individual numbers separated by spaces.
 
-set -e
+# List of critical items (files and directories)
+ITEMS=(
+    /etc/roundcubemail
+    /etc/httpd
+    /etc/dovecot
+    /etc/postfix
+    /etc/passwd
+    /etc/shadow
+    /etc/group
+    /etc/gshadow
+    /etc/sudoers
+    /etc/ssh/sshd_config
+    /etc/ssh/ssh_config
+    /etc/crontab
+    /etc/fstab
+    /etc/hosts
+    /etc/resolv.conf
+    /etc/sysctl.conf
+    /etc/selinux/config
+)
 
-# Prompt for backup to restore
-echo "Select the backup to restore:"
-echo "a) Apache"
-echo "b) Postfix"
-echo "c) Dovecot"
-echo "d) Roundcubemail"
-echo "e) MariaDB"
-echo "f) Network Configurations"
-echo "g) User and Authentication Data"
-echo "h) /root/COMPtools"
-echo "i) PHP Configuration File (/etc/php.ini)"
-echo "j) PHP Configuration Directory (/etc/php.d)"
-read -p "Enter your choice (a-j): " service_choice
+echo "Select the items you want to unlock (remove immutable attribute):"
+echo "Enter the numbers separated by spaces, or type 'all' to select everything."
+echo
 
-case "$service_choice" in
-  a|A)
-    SERVICE="apache"
-    ;;
-  b|B)
-    SERVICE="postfix"
-    ;;
-  c|C)
-    SERVICE="dovecot"
-    ;;
-  d|D)
-    SERVICE="roundcubemail"
-    ;;
-  e|E)
-    SERVICE="mariadb"
-    ;;
-  f|F)
-    SERVICE="network_configs"
-    ;;
-  g|G)
-    SERVICE="auth_data"
-    ;;
-  h|H)
-    SERVICE="COMPtools"
-    ;;
-  i|I)
-    SERVICE="php_ini"
-    ;;
-  j|J)
-    SERVICE="phpd"
-    ;;
-  *)
-    echo "Invalid selection. Exiting."
-    exit 1
-    ;;
-esac
+# Display the list with numbers
+for i in "${!ITEMS[@]}"; do
+    printf "%2d) %s\n" "$((i+1))" "${ITEMS[i]}"
+done
 
-# Prompt for backup location
-echo "Select the backup location to restore from:"
-echo "1) /etc/ftb"
-echo "2) /etc/.tarkov"
-read -p "Enter your choice (1 or 2): " loc_choice
+echo
+read -p "Your selection: " selection
 
-case "$loc_choice" in
-  1)
-    BACKUP_DIR="/etc/ftb"
-    ;;
-  2)
-    BACKUP_DIR="/etc/.tarkov"
-    ;;
-  *)
-    echo "Invalid selection. Exiting."
-    exit 1
-    ;;
-esac
-
-# Define the backup file
-BACKUP_FILE="${BACKUP_DIR}/${SERVICE}.zip"
-if [ ! -f "$BACKUP_FILE" ]; then
-  echo "Backup file $BACKUP_FILE not found! Exiting."
-  exit 1
+# Convert "all" to a list of all indices
+if [[ "$selection" =~ ^[Aa][Ll][Ll]$ ]]; then
+    indices=($(seq 1 ${#ITEMS[@]}))
+else
+    # Split the input into an array of numbers
+    read -r -a indices <<< "$selection"
 fi
 
-echo "Restoring $SERVICE from $BACKUP_FILE..."
+echo
+echo "Unlocking the following items (removing immutable attribute):"
+for num in "${indices[@]}"; do
+    # Validate the selection is a number within the correct range.
+    if ! [[ "$num" =~ ^[0-9]+$ ]] || [ "$num" -lt 1 ] || [ "$num" -gt "${#ITEMS[@]}" ]; then
+        echo "Invalid selection: $num. Skipping."
+        continue
+    fi
 
-# Change directory to / so that relative paths in the zip are restored correctly.
-cd /
+    item="${ITEMS[$((num-1))]}"
 
-# Unzip the backup archive. The -o flag overwrites existing files.
-unzip -o "$BACKUP_FILE"
+    # Check if the item exists and then remove the immutable attribute.
+    if [ -f "$item" ]; then
+        chattr -i "$item" 2>/dev/null && echo "Removed immutability from file: $item" || echo "Failed to unlock file: $item"
+    elif [ -d "$item" ]; then
+        chattr -R -i "$item" 2>/dev/null && echo "Removed immutability from directory: $item" || echo "Failed to unlock directory: $item"
+    else
+        echo "Item not found: $item"
+    fi
+done
 
-echo "$SERVICE restoration completed successfully."
+echo
+echo "Selected items have been processed."
