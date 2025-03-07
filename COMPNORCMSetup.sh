@@ -4,13 +4,11 @@
 #|     |<_> || || | \__ \/ ._> | | | | || . \
 #|_|_|_|<___||_||_| <___/\___. |_| `___||  _/
 #                                       |_|  
-# Written By Kayne
-
-# THIS IS THE SCRIPT WHEN NO ROUNDECUBEMAIL IS NEEDED
-
+#
+# THIS SCRIPT IS PURELY FOR WHEN YOU DONT HAVE ROUNDCUBE PRAY TO GOD ITS TRUE
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m             General Security Measures                      \e[0m"
+echo -e "\e[38;5;46m             General Security Measures                \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Only allow root login from console
@@ -63,6 +61,63 @@ for user in $(getent passwd | awk -F: '$3 >= 1000 {print $1}'); do
         usermod -s /bin/false "$user"
     fi
 done
+
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
+# Install fail2ban
+echo "Installing fail2ban..."
+sudo yum install -y -q fail2ban
+# Create fail2ban log file
+echo "Creating fail2ban log file..."
+sudo touch /var/log/fail2ban.log
+# Backup and configure fail2ban
+echo "Configuring fail2ban..."
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
+sed -i '/^\s*\[dovecot\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
+sed -i '/\[dovecot\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
+sed -i '/^\s*\[postfix\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
+sed -i '/\[postfix\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
+#sed -i '/^\s*\[apache-auth\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
+#sed -i '/\[apache-auth\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
+#sed -i '/^\s*\[roundcube-auth\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
+#sed -i '/\[roundcube-auth\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
+echo "Restarting fail2ban service..."
+systemctl enable fail2ban
+systemctl restart fail2ban
+
+
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+echo -e "\e[38;5;46m         Installing Comp Tools from Github            \e[0m"
+echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+sleep 1
+# Create the directory if it doesn't exist
+mkdir -p COMPtools
+
+# Base URL for the files
+base_url="https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/"
+
+# List of files to download
+files=(
+    "COMPMailBoxClear.sh"
+    "COMPInstallBroZEEK.sh"
+    "COMPBackupFIREWALL.sh"
+    "COMPcreatebackups.sh"
+    "COMPrestorefrombackup.sh"
+    "COMPautodiffer.sh"
+    "COMPaddimmute.sh"
+    "COMPremoveimmute.sh"
+)
+
+# Loop over each file and download it into the COMPtools directory
+for file in "${files[@]}"; do
+    echo "Downloading ${file}..."
+    wget -P COMPtools "${base_url}${file}"
+done
+
+echo "All files have been downloaded to the COMPtools directory."
 
 
 
@@ -142,10 +197,10 @@ sudo iptables -t filter -A OUTPUT -p udp --dport 143 -j ACCEPT
 sudo iptables -t filter -A INPUT -p udp --dport 143 -j ACCEPT
 
 # LDAP traffic
-#sudo iptables -t filter -A INPUT -p tcp --dport 389 -j ACCEPT
-#sudo iptables -t filter -A INPUT -p tcp --dport 636 -j ACCEPT
-#sudo iptables -t filter -A OUTPUT -p tcp --dport 389 -j ACCEPT
-#sudo iptables -t filter -A OUTPUT -p tcp --dport 636 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 389 -j ACCEPT
+sudo iptables -t filter -A INPUT -p tcp --dport 636 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 389 -j ACCEPT
+sudo iptables -t filter -A OUTPUT -p tcp --dport 636 -j ACCEPT
 
 
 # THESE ARE PER THE COMPETITION
@@ -158,6 +213,8 @@ sudo iptables-save | sudo tee /etc/sysconfig/iptables
 
 #SPECIFIC TO IPV6
 #sudo ip6tables-save | sudo tee /etc/sysconfig/ip6tables
+
+
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -314,7 +371,7 @@ echo "Updating and upgrading system packages. This may take a while..."
 #echo -e "\e[38;5;46m                     Securing PHP                     \e[0m"
 #echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 #sleep 1
-## Prevent PHP remote execution
+# Prevent PHP remote execution
 #echo "Disabling dangerous PHP functions..."
 #sed -i 's/^disable_functions =.*/disable_functions = exec,system,shell_exec,passthru,popen,proc_open/' /etc/php.ini
 
@@ -373,30 +430,26 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 #postconf -e 'smtpd_tls_loglevel = 1'
 #sudo systemctl restart postfix
 
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-sleep 1
-# Install fail2ban
-echo "Installing fail2ban..."
-yum install -y -q fail2ban
-# Create fail2ban log file
-echo "Creating fail2ban log file..."
-touch /var/log/fail2ban.log
-# Backup and configure fail2ban
-echo "Configuring fail2ban..."
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
-sed -i '/^\s*\[dovecot\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
-sed -i '/\[dovecot\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
-sed -i '/^\s*\[postfix\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
-sed -i '/\[postfix\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
-#sed -i '/^\s*\[apache-auth\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
-#sed -i '/\[apache-auth\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
-#sed -i '/^\s*\[roundcube-auth\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
-#sed -i '/\[roundcube-auth\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogpath = /var/log/fail2ban.log' /etc/fail2ban/jail.conf
-echo "Restarting fail2ban service..."
-systemctl enable fail2ban
-systemctl restart fail2ban
+echo "Configuring Postfix..."
+POSTFIX_CONFIG="/etc/postfix/main.cf"
+
+declare -A POSTFIX_SETTINGS=(
+    ["smtpd_client_connection_count_limit"]="10"
+    ["smtpd_client_connection_rate_limit"]="60"
+    ["smtpd_error_sleep_time"]="5s"
+    ["smtpd_soft_error_limit"]="10"
+    ["smtpd_hard_error_limit"]="20"
+    ["message_size_limit"]="10485760"
+    ["smtpd_recipient_restrictions"]="reject_unauth_destination"
+)
+
+for key in "${!POSTFIX_SETTINGS[@]}"; do
+    if ! grep -q "^$key" "$POSTFIX_CONFIG"; then
+        echo "$key = ${POSTFIX_SETTINGS[$key]}" >> "$POSTFIX_CONFIG"
+    fi
+done
+
+sudo systemctl restart postfix
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -408,7 +461,7 @@ echo "Installing required packages..."
 sudo yum install -y -q chkrootkit aide rkhunter clamav clamd clamav-update
 # Download and set up monitoring script
 echo "Downloading monitoring script..."
-sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
+#sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
 echo "Insalling Lynis..."
 sudo yum install lynis -y -q
 
@@ -424,10 +477,11 @@ sudo systemctl start auditd
 # Download audit rules and apply them
 echo "Setting up audit rules..."
 # MAKE SURE TO CHANGE THIS BEFORE YOU GO INTO COMPETITION
-sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/CustomAudit.rules
+sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/COMPCustomAudit.rules
 sudo rm /etc/audit/rules.d/audit.rules
-sudo mv CustomAudit.rules /etc/audit/rules.d/
-sudo auditctl -R /etc/audit/rules.d/audit.rules
+sudo mv COMPCustomAudit.rules /etc/audit/rules.d/
+sudo dos2unix /etc/audit/rules.d/COMPCustomAudit.rules
+#sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -436,8 +490,8 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Configure ClamAV
 echo "Configuring ClamAV..."
-sudo sed -i '8s/^/#/' /etc/freshclam.conf
-sudo freshclam
+#sudo sed -i '8s/^/#/' /etc/freshclam.conf
+#sudo freshclam
 
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -448,95 +502,10 @@ echo "Setting SE to enforce mode and turning off permissive.."
 sudo sed -i 's/^SELINUX=permissive/SELINUX=enforcing/' /etc/selinux/config
 #THESE ARE FOR POSTFIX TO WORK BECAUSE SE LINUX CAN BREAK IT
 sudo setsebool -P allow_postfix_local_write_mail_spool on
-#sudo setsebool -P httpd_can_sendmail on
-#sudo setsebool -P allow_postfix_local_write_mail_spool=1
+sudo setsebool -P httpd_can_sendmail on
+sudo setsebool -P allow_postfix_local_write_mail_spool=1
 sudo systemctl restart postfix
 
-
-
-
-
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m                     Backups                         \e[0m"
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-sleep 1
-# Create hidden directory for compressed files
-echo "Creating hidden directory..."
-sudo mkdir /lib/.tarkov
-# Archive and store system files
-# FIRST BACKUP
-echo "Compressing and storing system files individually..."
-sudo tar -czf /lib/.tarkov/shadow_backup.tar.gz /etc/shadow
-sudo tar -czf /lib/.tarkov/passwd_backup.tar.gz /etc/passwd
-sudo tar -czf /lib/.tarkov/fail2ban_backup.tar.gz /etc/fail2ban/
-sudo tar -czf /lib/.tarkov/hosts_backup.tar.gz /etc/hosts
-sudo tar -czf /lib/.tarkov/log_backup.tar.gz /var/log
-sudo tar -czf /lib/.tarkov/mail_backup.tar.gz /var/mail
-sudo tar -czf /lib/.tarkov/postfix_spool_backup.tar.gz /var/spool/postfix/
-sudo tar -czf /lib/.tarkov/postfix_backup.tar.gz /etc/postfix/
-sudo tar -czf /lib/.tarkov/dovecot_backup.tar.gz /etc/dovecot
-
-#SECOND BACKUP
-# backup_mailserver.sh
-#
-# A simple script to back up Postfix, Dovecot, Roundcube config, mail data, 
-# and the Roundcube MySQL database.
-
-# 1. Set variables
-BACKUP_DIR="/var/backups/mailserver"  # Where to store backup tarballs
-NOW=$(date +%Y%m%d_%H%M%S)           # Timestamp
-BACKUP_FILE="$BACKUP_DIR/mailserver_backup_$NOW.tar.gz"
-
-# 2. Roundcube Database Credentials
-#DB_NAME="roundcubemail"
-#DB_USER="root"
-#DB_PASS="YOUR_DB_PASSWORD"
-
-# 3. Additional directories to back up
-POSTFIX_DIR="/etc/postfix"
-DOVECOT_DIR="/etc/dovecot"
-#ROUNDCUBE_CONF_DIR="/etc/roundcubemail"
-MAIL_DIR="/var/mail"                 # Adjust if your mail is elsewhere
-#APACHE_CONF_DIR="/etc/httpd/conf"    # Optional
-#APACHE_CONF_D_DIR="/etc/httpd/conf.d"
-#SSL_CERT_DIR="/etc/pki/tls"
-
-# 4. Create backup directory if it doesn't exist
-if [ ! -d "$BACKUP_DIR" ]; then
-    mkdir -p "$BACKUP_DIR"
-fi
-
-# 5. Dump Roundcube MySQL database
-#echo "Dumping Roundcube database..."
-#mysqldump -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" > /tmp/roundcube.sql
-#if [ $? -ne 0 ]; then
-#    echo "Error: mysqldump failed. Exiting."
-#    exit 1
-#fi
-
-# 6. Create tarball of relevant directories + DB dump
-echo "Creating tar archive..."
-tar -czf "$BACKUP_FILE" \
-    "$POSTFIX_DIR" \
-    "$DOVECOT_DIR" \
-#    "$ROUNDCUBE_CONF_DIR" \
-    "$MAIL_DIR" \
-#    "$APACHE_CONF_DIR" \
-#    "$APACHE_CONF_D_DIR" \
-#    "$SSL_CERT_DIR" \
-#    /tmp/roundcube.sql \
-    /etc/aliases \
-    /etc/aliases.db 2>/dev/null
-
-# 7. Remove temporary DB dump
-#rm -f /tmp/roundcube.sql
-
-# 8. Confirm backup is complete
-if [ -f "$BACKUP_FILE" ]; then
-    echo "Backup successful: $BACKUP_FILE"
-else
-    echo "Backup failed!"
-fi
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
@@ -594,19 +563,13 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Create DIFFING directory
 echo "Creating DIFFING directory..."
-sudo mkdir DIFFING
+sudo mkdir /root/DIFFING
+sudo mkdir /root/DIFFING/CHANGES
 # Generate baseline system information
-echo "Generating baseline data..."
-sudo lsof -i -n | grep "LISTEN" > DIFFING/portdiffingBASELINE.txt
-sudo ss -t state established > DIFFING/connectiondiffingBASELINE.txt
-sudo cat /root/.bashrc > DIFFING/alias_diffingBASELINE.txt
-sudo find / -type f -executable 2>/dev/null > DIFFING/executables_diffingBASELINE.txt
-for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done > DIFFING/cron_diffingBASELINE.txt
-sudo cat /etc/shadow > DIFFING/users_diffingBASELINE.txt
+echo "Running auto-differ.."
+sudo bash /root/COMPtools/COMPautodiffer.sh
 
 
-#Running auditctl rules again because it doesnt like it the first time
-#sudo auditctl -R /etc/audit/rules.d/audit.rules
 
 
 #echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -667,25 +630,27 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Install XFCE                        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-sudo yum groupinstall "XFCE" "X Window System" -y -q
+sudo yum groupinstall "Xfce Desktop" -y -q
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-sudo mv /usr/bin/curl /usr/bin/oldcurl
-sudo mv /usr/bin/wget /usr/bin/oldwget
-sudo mv /usr/bin/ftp  /usr/bin/oldftp
-sudo mv /usr/bin/sftp /usr/bin/oldsftp
-sudo mv /usr/bin/aria2c /usr/bin/oldaria2c
-sudo mv /usr/bin/nc /usr/bin/oldnc
-sudo mv /usr/bin/socat /usr/bin/oldsocat
-sudo mv /usr/bin/telnet /usr/bin/oldtelnet
-sudo mv /usr/bin/tftp /usr/bin/oldtftp
-sudo mv /usr/bin/ncat    /usr/bin/oldncat  
-sudo mv /usr/bin/gdb     /usr/bin/oldgdb    
-sudo mv /usr/bin/strace  /usr/bin/oldstrace  
-sudo mv /usr/bin/ltrace  /usr/bin/oldltrace  
+echo "Making the secret location.."
+sudo mkdir /etc/stb
+sudo mv /usr/bin/curl /etc/stb/1
+sudo mv /usr/bin/wget /etc/stb/2
+sudo mv /usr/bin/ftp  /etc/stb/3
+sudo mv /usr/bin/sftp /etc/stb/4
+sudo mv /usr/bin/aria2c /etc/stb/5
+sudo mv /usr/bin/nc /etc/stb/6
+sudo mv /usr/bin/socat /etc/stb/7
+sudo mv /usr/bin/telnet /etc/stb/8
+sudo mv /usr/bin/tftp /etc/stb/9
+sudo mv /usr/bin/ncat    /etc/stb/10
+sudo mv /usr/bin/gdb     /etc/stb/11  
+sudo mv /usr/bin/strace  /etc/stb/12 
+sudo mv /usr/bin/ltrace  /etc/stb/13
 
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Locking Down Critical Files             \e[0m"
@@ -707,8 +672,6 @@ FILES=(
     /etc/resolv.conf
     /etc/sysctl.conf
     /etc/selinux/config
-    /etc/roundcube
-    /etc/postfix
 )
 
 # Loop through each file and set it immutable if it exists
@@ -721,15 +684,60 @@ for file in "${FILES[@]}"; do
     fi
 done
 
+# A helper function to apply ownership, perms, and immutability.
+set_permissions_and_immutable() {
+  local dir="$1"
+
+  echo "Applying ownership root:root to $dir ..."
+  sudo chown -R root:root "$dir"
+
+  echo "Setting directory permissions to 755 in $dir ..."
+  sudo find "$dir" -type d -exec chmod 755 {} \;
+
+  echo "Setting file permissions to 644 in $dir ..."
+  sudo find "$dir" -type f -exec chmod 644 {} \;
+
+  echo "Applying immutable attribute (+i) to $dir ..."
+  sudo chattr -R +i "$dir"
+
+  echo "Finished securing $dir."
+  echo
+}
+
+# List of directories we want to process
+CONFIG_DIRS=(
+  "/etc/roundcubemail"
+  "/etc/httpd"
+  "/etc/dovecot"
+  "/etc/postfix"
+)
+
+# Loop through each directory, prompt user, and apply changes if "y"
+for dir in "${CONFIG_DIRS[@]}"; do
+  echo "Directory: $dir"
+  read -r -p "Is this the correct directory to secure? (y/n): " answer
+
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    if [[ -d "$dir" ]]; then
+      set_permissions_and_immutable "$dir"
+    else
+      echo "Warning: $dir does not exist on this system. Skipping."
+      echo
+    fi
+  else
+    echo "Skipping $dir."
+    echo
+  fi
+done
 
 
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
-echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
+#echo -e "\e[38;5;46m            Initializing AIDE Database                \e[0m"
+#echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 
-echo "Initializing AIDE database (this may take a while).."
-sudo aide --init
-sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+#echo "Initializing AIDE database (this may take a while).."
+#sudo aide --init
+#sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 echo " "
 echo -e "\e[45mSCRIPT HAS FINISHED RUNNING... REBOOTING..\e[0m"
 sleep 3
