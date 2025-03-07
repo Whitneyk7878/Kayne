@@ -107,6 +107,8 @@ files=(
     "COMPcreatebackups.sh"
     "COMPrestorefrombackup.sh"
     "COMPautodiffer.sh"
+    "COMPaddimmute.sh"
+    "COMPremoveimmute.sh"
 )
 
 # Loop over each file and download it into the COMPtools directory
