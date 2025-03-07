@@ -563,7 +563,8 @@ echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 # Create DIFFING directory
 echo "Creating DIFFING directory..."
-sudo mkdir DIFFING
+sudo mkdir /root/DIFFING
+sudo mkdir /root/DIFFING/CHANGES
 # Generate baseline system information
 echo "Running auto-differ.."
 sudo bash /root/COMPtools/COMPautodiffer.sh
