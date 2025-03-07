@@ -461,7 +461,7 @@ echo "Installing required packages..."
 sudo yum install -y -q chkrootkit aide rkhunter clamav clamd clamav-update
 # Download and set up monitoring script
 echo "Downloading monitoring script..."
-sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
+#sudo wget https://raw.githubusercontent.com/UWStout-CCDC/kronos/master/Linux/General/monitor.sh
 echo "Insalling Lynis..."
 sudo yum install lynis -y -q
 
