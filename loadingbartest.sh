@@ -1,25 +1,42 @@
 #!/bin/bash
-# Fancy Progress Bar Function and Initialization
-progress_bar() {
-  local progress=$1
-  local total=$2
-  local bar_length=40
-  local percent=$(( progress * 100 / total ))
-  local filled=$(( progress * bar_length / total ))
-  local unfilled=$(( bar_length - filled ))
-  local filled_bar=$(printf "%0.s█" $(seq 1 $filled))
-  local unfilled_bar=$(printf "%0.s░" $(seq 1 $unfilled))
-  # \r returns the cursor to the beginning of the line.
-  printf "\r\033[1;36mProgress: [\033[1;32m%s\033[0m\033[1;31m%s\033[0m\033[1;36m] %3d%%\033[0m\n" "$filled_bar" "$unfilled_bar" "$percent"
-}
-
-# Total steps is based on the number of major sections in this script.
+# ============================================================
+#   Fancy Progress Bar (Constantly at the Bottom)
+# ============================================================
+# Total number of major steps in the script.
 total_steps=26
+# Global progress counter (updated in each section).
 current_step=0
 
-##########################################################################
-#                      General Security Measures                       #
-##########################################################################
+# Function that continuously draws the progress bar at the bottom.
+display_progress_bar() {
+  while true; do
+    # Save current cursor position.
+    tput sc
+    # Move cursor to the bottom line (last row, column 0).
+    tput cup $(($(tput lines) - 1)) 0
+    # Calculate progress values.
+    bar_length=40
+    percent=$(( current_step * 100 / total_steps ))
+    filled=$(( current_step * bar_length / total_steps ))
+    unfilled=$(( bar_length - filled ))
+    filled_bar=$(printf "%0.s█" $(seq 1 $filled))
+    unfilled_bar=$(printf "%0.s░" $(seq 1 $unfilled))
+    # Clear the line and print the progress bar.
+    printf "\033[2K\033[1;36mProgress: [\033[1;32m%s\033[0m\033[1;31m%s\033[0m\033[1;36m] %3d%%\033[0m" "$filled_bar" "$unfilled_bar" "$percent"
+    # Restore original cursor position.
+    tput rc
+    sleep 0.1
+  done
+}
+
+# Start the progress bar in the background.
+display_progress_bar &
+progress_pid=$!
+
+# ============================================================
+#  (Your Script Starts Below)
+# ============================================================
+
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m             General Security Measures                \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -33,9 +50,7 @@ echo "DONE"
 echo "ALL:ALL" > /etc/hosts.deny
 
 echo "Removing all users from the wheel group except root..."
-# Get a list of all users in the wheel group
 wheel_users=$(grep '^wheel:' /etc/group | cut -d: -f4 | tr ',' '\n')
-# Loop through each user and remove them if they are not root
 for user in $wheel_users; do
     if [[ "$user" != "root" ]]; then
         echo "Removing $user from wheel group..."
@@ -44,54 +59,40 @@ for user in $wheel_users; do
 done
 
 echo "Cleanup complete. Only root has sudo permissions now."
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#           Restricting Permissions: Only root full privileges           #
-##########################################################################
-#!/bin/bash  # (redundant shebang; can be removed if desired)
-# Ensure only root can run this script
+# ------------------------------------------------------------
+# Restricting permissions: Only root will have full privileges.
+# ------------------------------------------------------------
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root."
+    kill $progress_pid
     exit 1
 fi
 
 echo "Restricting permissions: Only root will have full privileges."
-# Loop through each user in the system (excluding root)
 for user in $(getent passwd | awk -F: '$3 >= 1000 {print $1}'); do
     if [[ "$user" != "root" ]]; then
         echo "Modifying permissions for user: $user"
-        # Set home directory permissions to read-only
         chmod -R 755 /home/"$user"
-        # Remove sudo/wheel access
         gpasswd -d "$user" wheel 2>/dev/null
         gpasswd -d "$user" sudo 2>/dev/null
-        # Set user shell to /bin/false to prevent login if needed
         usermod -s /bin/false "$user"
     fi
 done
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                      Implementing Fail2Ban                             #
-##########################################################################
+# ------------------------------------------------------------
+# Implementing Fail2Ban.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Implementing Fail2Ban                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-# Install fail2ban
 echo "Installing fail2ban..."
 sudo yum install -y -q fail2ban
-# Create fail2ban log file
 echo "Creating fail2ban log file..."
 sudo touch /var/log/fail2ban.log
-# Backup and configure fail2ban
 echo "Configuring fail2ban..."
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.BACKUP
 sed -i '/^\s*\[dovecot\]/,/^\[/{/logpath\s*=/d;/enabled\s*=/d;/bantime\s*=/d;/maxretry\s*=/d}' /etc/fail2ban/jail.conf
@@ -105,23 +106,17 @@ sed -i '/\[roundcube-auth\]/a enabled = true\nbantime = 1800\nmaxretry = 5\nlogp
 echo "Restarting fail2ban service..."
 systemctl enable fail2ban
 systemctl restart fail2ban
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                Installing Comp Tools from Github                     #
-##########################################################################
+# ------------------------------------------------------------
+# Installing Comp Tools from Github.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m         Installing Comp Tools from Github            \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-# Create the directory if it doesn't exist
 mkdir -p COMPtools
-# Base URL for the files
 base_url="https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/"
-# List of files to download
 files=(
     "COMPMailBoxClear.sh"
     "COMPInstallBroZEEK.sh"
@@ -132,20 +127,16 @@ files=(
     "COMPaddimmute.sh"
     "COMPremoveimmute.sh"
 )
-# Loop over each file and download it into the COMPtools directory
 for file in "${files[@]}"; do
     echo "Downloading ${file}..."
     wget -P COMPtools "${base_url}${file}"
 done
 echo "All files have been downloaded to the COMPtools directory."
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                           Firewall Setup                               #
-##########################################################################
+# ------------------------------------------------------------
+# Firewall Setup.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Firewall                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -199,15 +190,11 @@ sudo iptables -t filter -A INPUT -p tcp --dport 636 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p tcp --dport 389 -j ACCEPT
 sudo iptables -t filter -A OUTPUT -p tcp --dport 636 -j ACCEPT
 sudo iptables-save | sudo tee /etc/sysconfig/iptables
-# (IPv6 rules are commented out)
- 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
+current_step=$(( current_step + 1 ))
 
-##########################################################################
-#                           Stuff Removal                                #
-##########################################################################
+# ------------------------------------------------------------
+# Stuff Removal.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                Stuff Removal                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -248,17 +235,12 @@ sudo systemctl stop rpcsvcgssd && sudo systemctl disable rpcsvcgssd
 sudo systemctl stop rpcidmapd && sudo systemctl disable rpcidmapd
 systemctl disable netfs
 systemctl disable nfs
-
-# Remove hacker coding languages for COMP
 sudo yum remove -q -y ruby* java* perl* python* nodejs*
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                         Kernel Hardening                               #
-##########################################################################
+# ------------------------------------------------------------
+# Kernel Hardening.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Kernel Hardening                       \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -299,28 +281,22 @@ kernel.dmesg_restrict = 1
 kernel.yama.ptrace_scope = 3
 EOF
 sudo sysctl -p
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                        Update + Upgrade                                #
-##########################################################################
+# ------------------------------------------------------------
+# Update + Upgrade.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Update + Upgrade                       \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 echo "Updating and upgrading system packages. This may take a while..."
 #sudo yum update -y -q && yum upgrade -y -q
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                         Securing APACHE                                #
-##########################################################################
+# ------------------------------------------------------------
+# Securing APACHE.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Securing APACHE                        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -335,14 +311,11 @@ sed -i '/Options/d' /etc/httpd/conf/httpd.conf
 sed -i 's/AllowOverride All/AllowOverride None/' /etc/httpd/conf/httpd.conf
 sed -i 's/Require all granted/Require all denied/' /etc/httpd/conf/httpd.conf
 systemctl restart httpd
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                        Securing Roundcube                            #
-##########################################################################
+# ------------------------------------------------------------
+# Securing Roundcube.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m               Securing Roundcube                      \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -354,14 +327,11 @@ sed -i "s/\$config\['enable_installer'\] = true;/\$config['enable_installer'] = 
 sed -i "s/\$config\['default_host'\] = '';/\$config['default_host'] = 'ssl:\/\/localhost';/" /etc/roundcubemail/config.inc.php
 echo "RoundcubeMail secured."
 systemctl restart httpd
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                          Securing PHP                                  #
-##########################################################################
+# ------------------------------------------------------------
+# Securing PHP.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     Securing PHP                     \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -373,14 +343,11 @@ sudo sed -i 's/^expose_php\s*=\s*On/expose_php = Off/' /etc/php.ini
 sudo sed -i '/^\s*disable_functions\s*=/d' /etc/php.ini && sudo sh -c 'echo "disable_functions = exec,shell_exec,system,passthru,popen,proc_open,phpinfo,eval" >> /etc/php.ini'
 sed -i -e '/^[;\s]*allow_url_fopen\s*=/d' -e '/^[;\s]*allow_url_include\s*=/d' -e '$ a allow_url_fopen = Off\nallow_url_include = Off' /etc/php.ini
 systemctl restart httpd
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                         Securing Dovecot                              #
-##########################################################################
+# ------------------------------------------------------------
+# Securing Dovecot.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Dovecot                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -390,20 +357,15 @@ systemctl enable dovecot
 systemctl enable postfix
 systemctl start dovecot
 systemctl start postfix
-# (TLS configuration commented out)
 sudo systemctl restart dovecot
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                        Securing Postfix                              #
-##########################################################################
+# ------------------------------------------------------------
+# Securing Postfix.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Securing Postfix                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
-# (OpenSSL and TLS configuration commented out)
 echo "Configuring Postfix..."
 POSTFIX_CONFIG="/etc/postfix/main.cf"
 declare -A POSTFIX_SETTINGS=(
@@ -421,14 +383,11 @@ for key in "${!POSTFIX_SETTINGS[@]}"; do
     fi
 done
 sudo systemctl restart postfix
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                  Downloading Security Tools                          #
-##########################################################################
+# ------------------------------------------------------------
+# Downloading Security Tools.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Downloading Security Tools              \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -436,17 +395,14 @@ sleep 1
 echo "Installing required packages..."
 sudo yum install -y -q chkrootkit aide rkhunter clamav clamd clamav-update
 echo "Downloading monitoring script..."
-# (monitoring script download commented out)
+# (download command commented out)
 echo "Insalling Lynis..."
 sudo yum install lynis -y -q
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                            AuditD                                      #
-##########################################################################
+# ------------------------------------------------------------
+# AuditD.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     AuditD                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -459,29 +415,22 @@ sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/C
 sudo rm /etc/audit/rules.d/audit.rules
 sudo mv COMPCustomAudit.rules /etc/audit/rules.d/
 sudo dos2unix /etc/audit/rules.d/COMPCustomAudit.rules
-#sudo auditctl -R /etc/audit/rules.d/audit.rules
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                           CLAMAV                                       #
-##########################################################################
+# ------------------------------------------------------------
+# CLAMAV.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     CLAMAV                           \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 echo "Configuring ClamAV..."
 # (ClamAV configuration commands commented out)
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                          SE LINUX                                      #
-##########################################################################
+# ------------------------------------------------------------
+# SE LINUX.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     SE LINUX                           \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -491,47 +440,37 @@ sudo setsebool -P allow_postfix_local_write_mail_spool on
 sudo setsebool -P httpd_can_sendmail on
 sudo setsebool -P allow_postfix_local_write_mail_spool=1
 sudo systemctl restart postfix
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                  I HATE THE ANTICHRIST (compilers)                     #
-##########################################################################
+# ------------------------------------------------------------
+# I HATE THE ANTICHRIST (compilers).
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m            I HATE THE ANTICHRIST (compilers)         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 sudo yum remove libgcc clang make cmake automake autoconf -y -q
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#           IPv6 is for Microsoft Engineers not me                     #
-##########################################################################
+# ------------------------------------------------------------
+# IPv6 is for Microsoft Engineers not me.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m        IPv6 is for Microsoft Engineers not me        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-if grep -q "udp6" /etc/netconfig
-then
+if grep -q "udp6" /etc/netconfig; then
     echo "Support for RPC IPv6 already disabled"
 else
     echo "Disabling Support for RPC IPv6..."
     sed -i 's/udp6       tpi_clts      v     inet6    udp     -       -/#udp6       tpi_clts      v     inet6    udp     -       -/g' /etc/netconfig
     sed -i 's/tcp6       tpi_cots_ord  v     inet6    tcp     -       -/#tcp6       tpi_cots_ord  v     inet6    tcp     -       -/g' /etc/netconfig
 fi
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                         Cron Lockdown                                  #
-##########################################################################
+# ------------------------------------------------------------
+# Cron Lockdown.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                   Cron Lockdown                      \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
@@ -545,65 +484,50 @@ echo "Locking down AT"
 touch /etc/at.allow
 chmod 600 /etc/at.allow
 awk -F: '{print $1}' /etc/passwd | grep -v root > /etc/at.deny
-chmod 600 /etc/cron.deny
-chmod 600 /etc/at.deny
-chmod 600 /etc/crontab
+chmod 600 /etc/cron.deny /etc/at.deny /etc/crontab
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                              NTP                                       #
-##########################################################################
+# ------------------------------------------------------------
+# NTP.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                     NTP                         \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 sudo yum install ntpdate -y -q
 ntpdate pool.ntp.org
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                     Diffing for Baselines                              #
-##########################################################################
+# ------------------------------------------------------------
+# Diffing for Baselines.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m             Diffing for Baselines                    \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
 echo "Creating DIFFING directory..."
-sudo mkdir /root/DIFFING
-sudo mkdir /root/DIFFING/CHANGES
+sudo mkdir -p /root/DIFFING/CHANGES
 echo "Running auto-differ.."
 sudo bash /root/COMPtools/COMPautodiffer.sh
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                         Install XFCE                                   #
-##########################################################################
+# ------------------------------------------------------------
+# Install XFCE.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m                  Install XFCE                        \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sudo yum groupinstall "Xfce Desktop" -y -q
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#                  Carpet Bombing Binaries                             #
-##########################################################################
+# ------------------------------------------------------------
+# Carpet Bombing Binaries.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Carpet Bombing Binaries                 \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo "Making the secret location.."
-sudo mkdir /etc/stb
+sudo mkdir -p /etc/stb
 sudo mv /usr/bin/curl /etc/stb/1
 sudo mv /usr/bin/wget /etc/stb/2
 sudo mv /usr/bin/ftp  /etc/stb/3
@@ -613,38 +537,20 @@ sudo mv /usr/bin/nc /etc/stb/6
 sudo mv /usr/bin/socat /etc/stb/7
 sudo mv /usr/bin/telnet /etc/stb/8
 sudo mv /usr/bin/tftp /etc/stb/9
-sudo mv /usr/bin/ncat    /etc/stb/10
-sudo mv /usr/bin/gdb     /etc/stb/11  
-sudo mv /usr/bin/strace  /etc/stb/12 
-sudo mv /usr/bin/ltrace  /etc/stb/13
+sudo mv /usr/bin/ncat /etc/stb/10
+sudo mv /usr/bin/gdb /etc/stb/11  
+sudo mv /usr/bin/strace /etc/stb/12 
+sudo mv /usr/bin/ltrace /etc/stb/13
+current_step=$(( current_step + 1 ))
 
-# Update progress
-((current_step++))
-progress_bar $current_step $total_steps
-
-##########################################################################
-#              Locking Down Critical Files                             #
-##########################################################################
+# ------------------------------------------------------------
+# Locking Down Critical Files.
+# ------------------------------------------------------------
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 echo -e "\e[38;5;46m              Locking Down Critical Files             \e[0m"
 echo -e "\e[38;5;46m//////////////////////////////////////////////////////\e[0m"
 sleep 1
-# List of critical files to protect
-FILES=(
-    /etc/passwd
-    /etc/shadow
-    /etc/group
-    /etc/gshadow
-    /etc/sudoers
-    /etc/ssh/sshd_config
-    /etc/ssh/ssh_config
-    /etc/crontab
-    /etc/fstab
-    /etc/hosts
-    /etc/resolv.conf
-    /etc/sysctl.conf
-    /etc/selinux/config
-)
+FILES=( /etc/passwd /etc/shadow /etc/group /etc/gshadow /etc/sudoers /etc/ssh/sshd_config /etc/ssh/ssh_config /etc/crontab /etc/fstab /etc/hosts /etc/resolv.conf /etc/sysctl.conf /etc/selinux/config )
 for file in "${FILES[@]}"; do
     if [ -f "$file" ]; then
         chattr +i "$file"
@@ -653,6 +559,8 @@ for file in "${FILES[@]}"; do
         echo "File not found: $file"
     fi
 done
+
+# Helper function to secure directories.
 set_permissions_and_immutable() {
   local dir="$1"
   echo "Applying ownership root:root to $dir ..."
@@ -666,12 +574,7 @@ set_permissions_and_immutable() {
   echo "Finished securing $dir."
   echo
 }
-CONFIG_DIRS=(
-  "/etc/roundcubemail"
-  "/etc/httpd"
-  "/etc/dovecot"
-  "/etc/postfix"
-)
+CONFIG_DIRS=( "/etc/roundcubemail" "/etc/httpd" "/etc/dovecot" "/etc/postfix" )
 for dir in "${CONFIG_DIRS[@]}"; do
   echo "Directory: $dir"
   read -r -p "Is this the correct directory to secure? (y/n): " answer
@@ -687,12 +590,13 @@ for dir in "${CONFIG_DIRS[@]}"; do
     echo
   fi
 done
+current_step=$(( current_step + 1 ))
 
-# Final progress update before finishing
-((current_step++))
-progress_bar $current_step $total_steps
-
+# Final Step: Clean up and reboot.
 echo " "
 echo -e "\e[45mSCRIPT HAS FINISHED RUNNING... REBOOTING..\e[0m"
 sleep 3
+
+# Kill the background progress bar process.
+kill $progress_pid
 sudo reboot
