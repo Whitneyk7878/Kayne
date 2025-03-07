@@ -1,63 +1,108 @@
-
 #!/bin/bash
-# Diffing Baselines Script
+# Interactive Restore Script
+# This script lets you choose which backup to restore from the following options:
+#   - Apache (configuration and web files)
+#   - Postfix (configuration)
+#   - Dovecot (configuration)
+#   - Roundcubemail (configuration and web files)
+#   - MariaDB (data directory)
+#   - Network configurations (network settings)
+#   - User and authentication data (e.g. /etc/passwd, /etc/shadow, etc.)
+#   - /root/COMPtools (custom tools)
+#   - PHP configuration file (/etc/php.ini)
+#   - PHP configuration directory (/etc/php.d)
+#
+# It then restores the selected archive from one of the two backup locations
+# (/etc/ftb or /etc/.tarkov) into the root directory (/).
+#
+# WARNING: Restoring will overwrite existing files in the target directories.
+# Ensure you have current backups before proceeding.
 
-# Define directories
-BASE_DIR="/root/DIFFING"
-CHANGES_DIR="${BASE_DIR}/CHANGES"
-# UNCOMMENT THIS IF YOU DONT MAKE THEM IN AN INIT SCRIPT LIKE ME
-#mkdir -p "${BASE_DIR}" "${CHANGES_DIR}"
+set -e
 
-# Colors because they make me happy
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Prompt for backup to restore
+echo "Select the backup to restore:"
+echo "a) Apache"
+echo "b) Postfix"
+echo "c) Dovecot"
+echo "d) Roundcubemail"
+echo "e) MariaDB"
+echo "f) Network Configurations"
+echo "g) User and Authentication Data"
+echo "h) /root/COMPtools"
+echo "i) PHP Configuration File (/etc/php.ini)"
+echo "j) PHP Configuration Directory (/etc/php.d)"
+read -p "Enter your choice (a-j): " service_choice
 
-# Declare an associative array of commands.
-declare -A commands
-commands[aureport]="aureport -i"
-commands[services]="systemctl list-units --type=service --all --no-pager --no-legend | cut -d ' ' -f1 | sort"
-commands[port]="ss -tulnp | sort"
-commands[connection]="ss -tanp | sort"
-commands[alias]="alias | sort"
-commands[executables]="find /usr/bin /usr/sbin /bin /sbin -type f | sort"
-commands[cron]='for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done'
-commands[users]="sudo cat /etc/shadow"
-commands[rootkit]="sudo chkrootkit"
-commands[iptables]="iptables-save | sed -E 's/\[.*?\]//g' | sed '/^#/d' | sort"
-commands[free]="free -h"
-commands[processes]="ps aux --sort=user,pid"
-commands[yum_installed]="rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort"
+case "$service_choice" in
+  a|A)
+    SERVICE="apache"
+    ;;
+  b|B)
+    SERVICE="postfix"
+    ;;
+  c|C)
+    SERVICE="dovecot"
+    ;;
+  d|D)
+    SERVICE="roundcubemail"
+    ;;
+  e|E)
+    SERVICE="mariadb"
+    ;;
+  f|F)
+    SERVICE="network_configs"
+    ;;
+  g|G)
+    SERVICE="auth_data"
+    ;;
+  h|H)
+    SERVICE="COMPtools"
+    ;;
+  i|I)
+    SERVICE="php_ini"
+    ;;
+  j|J)
+    SERVICE="phpd"
+    ;;
+  *)
+    echo "Invalid selection. Exiting."
+    exit 1
+    ;;
+esac
 
-# Loop over each command, capturing and diffing the outputs.
-for key in "${!commands[@]}"; do
-    echo "Processing ${key} baseline..."
-    current_file="${BASE_DIR}/${key}_current.txt"
-    previous_file="${BASE_DIR}/${key}_previous.txt"
-    diff_file="${CHANGES_DIR}/${key}_diff.txt"
+# Prompt for backup location
+echo "Select the backup location to restore from:"
+echo "1) /etc/ftb"
+echo "2) /etc/.tarkov"
+read -p "Enter your choice (1 or 2): " loc_choice
 
-    # If a current baseline exists, move it to previous.
-    if [ -f "$current_file" ]; then
-        mv "$current_file" "$previous_file"
-    fi
+case "$loc_choice" in
+  1)
+    BACKUP_DIR="/etc/ftb"
+    ;;
+  2)
+    BACKUP_DIR="/etc/.tarkov"
+    ;;
+  *)
+    echo "Invalid selection. Exiting."
+    exit 1
+    ;;
+esac
 
-    # Run the command and save its output as the new current baseline.
-    eval ${commands[$key]} > "$current_file"
+# Define the backup file
+BACKUP_FILE="${BACKUP_DIR}/${SERVICE}.zip"
+if [ ! -f "$BACKUP_FILE" ]; then
+  echo "Backup file $BACKUP_FILE not found! Exiting."
+  exit 1
+fi
 
-    # If a previous baseline exists, perform a unified diff.
-    if [ -f "$previous_file" ]; then
-        diff -u "$previous_file" "$current_file" > "$diff_file"
-        if [ -s "$diff_file" ]; then
-            echo -e "${RED}Differences found for ${key} (see ${diff_file}).${NC}"
-        else
-            echo -e "${GREEN}No differences found for ${key}.${NC}"
-            rm -f "$diff_file"
-        fi
-    else
-        echo "No previous baseline for ${key}. Baseline saved as current."
-    fi
+echo "Restoring $SERVICE from $BACKUP_FILE..."
 
-done
+# Change directory to / so that relative paths in the zip are restored correctly.
+cd /
 
-echo "Diffing complete. Baseline files are in ${BASE_DIR} and diffs (if any) in ${CHANGES_DIR}."
+# Unzip the backup archive. The -o flag overwrites existing files.
+unzip -o "$BACKUP_FILE"
 
+echo "$SERVICE restoration completed successfully."
