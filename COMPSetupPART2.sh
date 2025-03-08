@@ -97,7 +97,7 @@ sleep 1
 mkdir -p COMPtools
 
 # Base URL for the files
-base_url="https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/"
+base_url="https://raw.githubusercontent.com/UWStout-CCDC/CCDC-scripts/refs/heads/master/linux/fedora21/"
 
 # List of files to download
 files=(
@@ -477,7 +477,7 @@ sudo systemctl start auditd
 # Download audit rules and apply them
 echo "Setting up audit rules..."
 # MAKE SURE TO CHANGE THIS BEFORE YOU GO INTO COMPETITION
-sudo wget https://raw.githubusercontent.com/Whitneyk7878/Kayne/refs/heads/main/COMPCustomAudit.rules
+sudo wget https://raw.githubusercontent.com/UWStout-CCDC/CCDC-scripts/refs/heads/master/linux/fedora21/COMPCustomAudit.rules
 sudo rm /etc/audit/rules.d/audit.rules
 sudo mv COMPCustomAudit.rules /etc/audit/rules.d/
 sudo dos2unix /etc/audit/rules.d/COMPCustomAudit.rules
