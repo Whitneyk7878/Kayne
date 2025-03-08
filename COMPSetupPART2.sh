@@ -109,6 +109,7 @@ files=(
     "COMPautodiffer.sh"
     "COMPaddimmute.sh"
     "COMPremoveimmute.sh"
+    "COMPTotallyNotAWindowsDesktop"
 )
 
 # Loop over each file and download it into the COMPtools directory
