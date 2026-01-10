@@ -291,7 +291,7 @@ print_header() {
   printf "OS Family: %s | Init: %s | Pkg: %s | Root: %s\n" "$OS_FAMILY" "$INIT_SYSTEM" "$PKG_MGR" "$(is_root && echo yes || echo no)"
   printf "Path: %s\n" "$(breadcrumb)"
   hr
-  echo "Controls: enter option number/letter, 'b' back, 'r' refresh, 'c' clear output, 's' save report, 'q' quit"
+  echo "Controls: enter option number/letter, 'b' back, 'r' refresh, 'c' clear output, 's' save report, 'q' quit, 'p' FULL SCREEN OUTPUT"
   hr
 }
 
