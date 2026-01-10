@@ -29,6 +29,20 @@ SYSTEMD_LIB_DIRS=()      # /lib/systemd/system or /usr/lib/systemd/system etc
 NEED_REDRAW=1
 LAST_MENU=""
 MENU_STACK=("main")
+################################################# CUSTOM ###############################################
+
+view_full_output() {
+  if command -v less >/dev/null 2>&1; then
+    less -R +G "$LOGFILE"
+  else
+    echo "less not found. Install it or use: cat \"$LOGFILE\" | more"
+    read -r _
+  fi
+}
+
+######################################################################################################
+
+
 
 # ------------------------------ Utilities -------------------------------------
 ts() { date +"%Y-%m-%d %H:%M:%S"; }
@@ -1617,6 +1631,9 @@ main() {
       s|save)
         rep_save_log
         ;;
+      p|pager)
+      view_full_output
+      ;;
       "")
         : # no-op
         ;;
