@@ -25,7 +25,7 @@ STACK_DIR="${STACK_DIR:-/opt/local-mailserver}"
 
 # Space-separated list of local mailbox users to create inside container.
 # Format: "username:password username2:password2"
-MAIL_USERS="${MAIL_USERS:-alice:changeme bob:changeme}"
+MAIL_USERS="${MAIL_USERS:-mailtest:changeme123 mailuser:changeme123}"
 
 ############################
 # PRECHECKS
