@@ -19,8 +19,8 @@ set -Eeuo pipefail
 ############################
 # CONFIG - EDIT THESE
 ############################
-MAIL_DOMAIN="${MAIL_DOMAIN:-example.lab}"
-MAIL_HOSTNAME="${MAIL_HOSTNAME:-mail.example.lab}"
+MAIL_DOMAIN="${MAIL_DOMAIN:-fedora.mail}"
+MAIL_HOSTNAME="${MAIL_HOSTNAME:-fedora.mail}"
 STACK_DIR="${STACK_DIR:-/opt/local-mailserver}"
 
 # Space-separated list of local mailbox users to create inside container.
